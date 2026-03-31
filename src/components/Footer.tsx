@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone, Facebook } from "lucide-react";
 import { services } from "@/data/services";
+import logo from "@/assets/logo.jpg";
 
 const Footer = () => (
   <footer>
@@ -21,8 +22,8 @@ const Footer = () => (
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl font-display font-bold text-gold">A</span>
+            <div className="flex items-center gap-3 mb-4">
+              <img src={logo} alt="Asante Andi Consulting" className="h-10 w-auto rounded-md" />
               <div>
                 <span className="font-display font-bold">Asante Andi</span>
                 <span className="block text-xs opacity-70">Consulting</span>
