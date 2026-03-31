@@ -10,6 +10,7 @@ import PageTransition from "@/components/PageTransition";
 const BookingPage = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
   const [form, setForm] = useState({
     fullName: "",
     email: "",
