@@ -1,16 +1,170 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { GraduationCap, BookOpen, Baby, Users, PenTool, Briefcase, Star, CheckCircle, Zap, Shield, Clock, Heart } from "lucide-react";
+import { services, institutions } from "@/data/services";
+import Layout from "@/components/Layout";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
-  return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
-  );
+const iconMap: Record<string, React.ReactNode> = {
+  GraduationCap: <GraduationCap className="w-6 h-6" />,
+  BookOpen: <BookOpen className="w-6 h-6" />,
+  Baby: <Baby className="w-6 h-6" />,
+  Users: <Users className="w-6 h-6" />,
+  PenTool: <PenTool className="w-6 h-6" />,
+  Briefcase: <Briefcase className="w-6 h-6" />,
 };
 
-const Index = PlaceholderIndex;
+const trustFeatures = [
+  { icon: <Shield className="w-6 h-6" />, title: "Ethical Guidance", desc: "Academic integrity at the core of everything we do" },
+  { icon: <Clock className="w-6 h-6" />, title: "Quick Turnaround", desc: "Fast, reliable delivery meeting your deadlines" },
+  { icon: <Star className="w-6 h-6" />, title: "Expert Support", desc: "Qualified professionals across all academic fields" },
+  { icon: <Heart className="w-6 h-6" />, title: "Student-Centred", desc: "Personalised approach to every learner's needs" },
+  { icon: <Zap className="w-6 h-6" />, title: "Affordable Pricing", desc: "Quality academic support accessible to all" },
+  { icon: <CheckCircle className="w-6 h-6" />, title: "Proven Results", desc: "500+ students supported across 10+ institutions" },
+];
 
-export default Index;
+const testimonials = [
+  { name: "Thandi M.", role: "SANTS Student", text: "Asante Andi helped me complete my assignments on time. Their support was amazing and I passed with distinction!" },
+  { name: "Sipho K.", role: "UNISA Honours", text: "The research guidance I received for my dissertation was invaluable. Professional and thorough." },
+  { name: "Nomsa D.", role: "ECD Practitioner", text: "The ECD training sessions are well-structured and practical. I recommend them to every practitioner." },
+  { name: "James L.", role: "UJ Postgrad", text: "From proposal to viva prep, they walked with me every step. Truly further together!" },
+];
+
+const HomePage = () => (
+  <Layout>
+    {/* Hero */}
+    <section className="relative gradient-hero dot-pattern min-h-[90vh] flex items-center pt-20">
+      <div className="container py-16 md:py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="max-w-2xl"
+        >
+          <div className="flex flex-wrap gap-2 mb-6">
+            {["Research", "Workshops", "Consultation & Training", "SANTS Specialist"].map(badge => (
+              <span key={badge} className="px-3 py-1 rounded-full text-xs font-bold bg-gold/20 text-gold border border-gold/30">{badge}</span>
+            ))}
+          </div>
+          <h1 className="text-4xl md:text-6xl font-display font-bold text-dark-bg-foreground leading-tight mb-6">
+            Go <span className="text-gradient-gold">Further</span> Together 🇿🇦
+          </h1>
+          <p className="text-lg md:text-xl text-dark-bg-foreground/80 font-body mb-8 max-w-lg">
+            Skills development, academic support, and research guidance for South African students and professionals.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link to="/book" className="px-8 py-4 rounded-lg bg-accent text-accent-foreground font-bold text-center hover:opacity-90 transition-opacity">
+              Book a Service
+            </Link>
+            <a href="https://wa.me/27760884005" target="_blank" rel="noopener noreferrer" className="px-8 py-4 rounded-lg border-2 border-dark-bg-foreground/30 text-dark-bg-foreground font-bold text-center hover:bg-dark-bg-foreground/10 transition-colors">
+              WhatsApp Us
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+
+    {/* Stats */}
+    <section className="bg-primary text-primary-foreground py-6">
+      <div className="container">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          {[
+            { value: "500+", label: "Students Supported" },
+            { value: "6", label: "Service Categories" },
+            { value: "10+", label: "Institutions" },
+            { value: "Fast", label: "Turnaround" },
+          ].map(stat => (
+            <div key={stat.label}>
+              <div className="text-2xl md:text-3xl font-display font-bold text-gold">{stat.value}</div>
+              <div className="text-xs md:text-sm opacity-80">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* Institutions Ticker */}
+    <section className="bg-muted py-4 overflow-hidden">
+      <div className="flex animate-ticker">
+        {[...institutions, ...institutions].map((inst, i) => (
+          <span key={i} className="px-6 text-sm font-semibold text-muted-foreground whitespace-nowrap">{inst}</span>
+        ))}
+      </div>
+    </section>
+
+    {/* Services */}
+    <section className="py-16 md:py-24">
+      <div className="container">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-3">Our Services</h2>
+          <p className="text-muted-foreground max-w-lg mx-auto">Comprehensive academic support and skills development tailored for South African learners.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((s, i) => (
+            <motion.div
+              key={s.slug}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <Link to={`/services/${s.slug}`} className="block bg-card rounded-xl border border-border p-6 hover:shadow-lg hover:border-primary/20 transition-all group h-full">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                  {iconMap[s.icon]}
+                </div>
+                <span className="text-xs font-bold text-gold uppercase">{s.highlight}</span>
+                <h3 className="font-display font-bold text-lg text-foreground mt-1 mb-2">{s.title}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{s.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-primary">From {s.startingPrice}</span>
+                  <span className="text-sm font-semibold text-accent group-hover:translate-x-1 transition-transform">Learn More →</span>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* Why Choose Us */}
+    <section className="py-16 md:py-24 bg-muted/50">
+      <div className="container">
+        <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-12">Why Choose Asante Andi?</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+          {trustFeatures.map((f, i) => (
+            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
+              className="bg-card rounded-xl p-6 border border-border">
+              <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center text-gold mb-3">{f.icon}</div>
+              <h4 className="font-display font-bold text-foreground mb-1">{f.title}</h4>
+              <p className="text-sm text-muted-foreground">{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <h3 className="text-2xl font-display font-bold text-foreground text-center mb-8">What Our Students Say</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {testimonials.map((t, i) => (
+            <div key={i} className="bg-card rounded-xl p-6 border border-border">
+              <div className="flex gap-1 mb-3">{[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-gold text-gold" />)}</div>
+              <p className="text-sm text-muted-foreground mb-4 italic">"{t.text}"</p>
+              <div><span className="font-bold text-foreground">{t.name}</span> <span className="text-xs text-muted-foreground">· {t.role}</span></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* Final CTA */}
+    <section className="gradient-cta py-16">
+      <div className="container text-center">
+        <h2 className="text-3xl md:text-4xl font-display font-bold text-accent-foreground mb-4">Start Your Journey Today</h2>
+        <p className="text-accent-foreground/80 mb-8 max-w-md mx-auto">Join 500+ students who have taken the step towards academic excellence.</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link to="/book" className="px-8 py-4 rounded-lg bg-card text-foreground font-bold hover:bg-card/90 transition-colors">Book a Service</Link>
+          <a href="https://wa.me/27760884005" target="_blank" rel="noopener noreferrer" className="px-8 py-4 rounded-lg border-2 border-accent-foreground text-accent-foreground font-bold hover:bg-accent-foreground/10 transition-colors">WhatsApp Us</a>
+        </div>
+      </div>
+    </section>
+  </Layout>
+);
+
+export default HomePage;
