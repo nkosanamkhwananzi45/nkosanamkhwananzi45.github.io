@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { services, getServiceBySlug } from "@/data/services";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import PageTransition from "@/components/PageTransition";
 
