@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { services } from "@/data/services";
+import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -31,7 +32,7 @@ const Navbar = () => {
     <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${navBg}`}>
       <div className="container flex items-center justify-between h-16 md:h-20">
         <Link to="/" className="flex items-center gap-2">
-          <span className={`text-2xl font-display font-bold ${scrolled || !isHome ? "text-primary" : "text-gold"}`}>A</span>
+          <img src={logo} alt="Asante Andi Consulting" className="h-10 md:h-12 w-auto rounded-md" />
           <div className={`leading-tight ${textColor}`}>
             <span className="font-display font-bold text-sm md:text-base">Asante Andi</span>
             <span className="block text-xs opacity-70">Consulting</span>
