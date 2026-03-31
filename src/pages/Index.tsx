@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { GraduationCap, BookOpen, Baby, Users, PenTool, Briefcase, Star, CheckCircle, Zap, Shield, Clock, Heart } from "lucide-react";
 import { services, institutions } from "@/data/services";
 import Layout from "@/components/Layout";
+import heroBg from "@/assets/hero-bg.jpg";
 
 const iconMap: Record<string, React.ReactNode> = {
   GraduationCap: <GraduationCap className="w-6 h-6" />,
@@ -29,17 +30,23 @@ const testimonials = [
   { name: "James L.", role: "UJ Postgrad", text: "From proposal to viva prep, they walked with me every step. Truly further together!" },
 ];
 
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-50px" },
+};
+
 const HomePage = () => (
   <Layout>
     {/* Hero */}
-    <section className="relative gradient-hero dot-pattern min-h-[90vh] flex items-center pt-20">
-      <div className="container py-16 md:py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="max-w-2xl"
-        >
+    <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
+      <div className="absolute inset-0">
+        <img src={heroBg} alt="" className="w-full h-full object-cover" width={1920} height={1080} />
+        <div className="absolute inset-0 bg-gradient-to-r from-dark-bg/90 via-dark-bg/75 to-dark-bg/50" />
+        <div className="absolute inset-0 dot-pattern" />
+      </div>
+      <div className="container py-16 md:py-24 relative z-10">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="max-w-2xl">
           <div className="flex flex-wrap gap-2 mb-6">
             {["Research", "Workshops", "Consultation & Training", "SANTS Specialist"].map(badge => (
               <span key={badge} className="px-3 py-1 rounded-full text-xs font-bold bg-gold/20 text-gold border border-gold/30">{badge}</span>
@@ -64,7 +71,7 @@ const HomePage = () => (
     </section>
 
     {/* Stats */}
-    <section className="bg-primary text-primary-foreground py-6">
+    <motion.section {...fadeInUp} transition={{ duration: 0.5 }} className="bg-primary text-primary-foreground py-6">
       <div className="container">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           {[
@@ -80,7 +87,7 @@ const HomePage = () => (
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
 
     {/* Institutions Ticker */}
     <section className="bg-muted py-4 overflow-hidden">
@@ -94,19 +101,13 @@ const HomePage = () => (
     {/* Services */}
     <section className="py-16 md:py-24">
       <div className="container">
-        <div className="text-center mb-12">
+        <motion.div {...fadeInUp} transition={{ duration: 0.5 }} className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-3">Our Services</h2>
           <p className="text-muted-foreground max-w-lg mx-auto">Comprehensive academic support and skills development tailored for South African learners.</p>
-        </div>
+        </motion.div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((s, i) => (
-            <motion.div
-              key={s.slug}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
+            <motion.div key={s.slug} {...fadeInUp} transition={{ delay: i * 0.1, duration: 0.5 }}>
               <Link to={`/services/${s.slug}`} className="block bg-card rounded-xl border border-border p-6 hover:shadow-lg hover:border-primary/20 transition-all group h-full">
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                   {iconMap[s.icon]}
@@ -128,10 +129,10 @@ const HomePage = () => (
     {/* Why Choose Us */}
     <section className="py-16 md:py-24 bg-muted/50">
       <div className="container">
-        <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-12">Why Choose Asante Andi?</h2>
+        <motion.h2 {...fadeInUp} transition={{ duration: 0.5 }} className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-12">Why Choose Asante Andi?</motion.h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {trustFeatures.map((f, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
+            <motion.div key={i} {...fadeInUp} transition={{ delay: i * 0.08, duration: 0.5 }}
               className="bg-card rounded-xl p-6 border border-border">
               <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center text-gold mb-3">{f.icon}</div>
               <h4 className="font-display font-bold text-foreground mb-1">{f.title}</h4>
@@ -140,21 +141,21 @@ const HomePage = () => (
           ))}
         </div>
 
-        <h3 className="text-2xl font-display font-bold text-foreground text-center mb-8">What Our Students Say</h3>
+        <motion.h3 {...fadeInUp} transition={{ duration: 0.5 }} className="text-2xl font-display font-bold text-foreground text-center mb-8">What Our Students Say</motion.h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {testimonials.map((t, i) => (
-            <div key={i} className="bg-card rounded-xl p-6 border border-border">
+            <motion.div key={i} {...fadeInUp} transition={{ delay: i * 0.1, duration: 0.5 }} className="bg-card rounded-xl p-6 border border-border">
               <div className="flex gap-1 mb-3">{[...Array(5)].map((_, j) => <Star key={j} className="w-4 h-4 fill-gold text-gold" />)}</div>
               <p className="text-sm text-muted-foreground mb-4 italic">"{t.text}"</p>
               <div><span className="font-bold text-foreground">{t.name}</span> <span className="text-xs text-muted-foreground">· {t.role}</span></div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
 
     {/* Final CTA */}
-    <section className="gradient-cta py-16">
+    <motion.section {...fadeInUp} transition={{ duration: 0.6 }} className="gradient-cta py-16">
       <div className="container text-center">
         <h2 className="text-3xl md:text-4xl font-display font-bold text-accent-foreground mb-4">Start Your Journey Today</h2>
         <p className="text-accent-foreground/80 mb-8 max-w-md mx-auto">Join 500+ students who have taken the step towards academic excellence.</p>
@@ -163,7 +164,7 @@ const HomePage = () => (
           <a href="https://wa.me/27760884005" target="_blank" rel="noopener noreferrer" className="px-8 py-4 rounded-lg border-2 border-accent-foreground text-accent-foreground font-bold hover:bg-accent-foreground/10 transition-colors">WhatsApp Us</a>
         </div>
       </div>
-    </section>
+    </motion.section>
   </Layout>
 );
 
