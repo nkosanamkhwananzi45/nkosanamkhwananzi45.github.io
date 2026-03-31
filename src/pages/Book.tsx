@@ -3,12 +3,14 @@ import { useSearchParams } from "react-router-dom";
 import { services, getServiceBySlug } from "@/data/services";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
 import PageTransition from "@/components/PageTransition";
 
 const BookingPage = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -60,6 +62,7 @@ const BookingPage = () => {
           amount,
           status: 'pending',
           payment_status: amount > 0 ? 'unpaid' : 'quote_requested',
+          user_id: user?.id || null,
         })
         .select()
         .single();

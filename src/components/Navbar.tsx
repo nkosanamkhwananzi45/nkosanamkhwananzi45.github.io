@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, User } from "lucide-react";
 import { services } from "@/data/services";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
@@ -10,6 +11,7 @@ const Navbar = () => {
   const [servicesOpen, setServicesOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const { user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -58,9 +60,18 @@ const Navbar = () => {
           <Link to="/pricing" className="text-sm font-semibold hover:opacity-80 transition-opacity">Pricing</Link>
           <Link to="/about" className="text-sm font-semibold hover:opacity-80 transition-opacity">About</Link>
           <Link to="/contact" className="text-sm font-semibold hover:opacity-80 transition-opacity">Contact</Link>
-          <Link to="/book" className="ml-2 px-5 py-2.5 rounded-lg bg-accent text-accent-foreground font-bold text-sm hover:opacity-90 transition-opacity">
-            Book Now
-          </Link>
+          {user ? (
+            <Link to="/dashboard" className="ml-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+              <User className="w-4 h-4" /> Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm font-semibold hover:opacity-80 transition-opacity">Sign In</Link>
+              <Link to="/book" className="ml-2 px-5 py-2.5 rounded-lg bg-accent text-accent-foreground font-bold text-sm hover:opacity-90 transition-opacity">
+                Book Now
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -89,6 +100,14 @@ const Navbar = () => {
             <Link to="/about" className="py-3 px-4 text-foreground font-semibold rounded-lg hover:bg-muted">About</Link>
             <Link to="/contact" className="py-3 px-4 text-foreground font-semibold rounded-lg hover:bg-muted">Contact</Link>
             <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
+              {user ? (
+                <Link to="/dashboard" className="text-center py-3 rounded-lg bg-primary text-primary-foreground font-bold">Dashboard</Link>
+              ) : (
+                <>
+                  <Link to="/login" className="text-center py-3 rounded-lg bg-primary text-primary-foreground font-bold">Sign In</Link>
+                  <Link to="/signup" className="text-center py-3 rounded-lg border border-border text-foreground font-bold">Sign Up</Link>
+                </>
+              )}
               <Link to="/book" className="text-center py-3 rounded-lg bg-accent text-accent-foreground font-bold">Book Now</Link>
               <a href="https://wa.me/27760884005" target="_blank" rel="noopener noreferrer" className="text-center py-3 rounded-lg bg-whatsapp text-accent-foreground font-bold">WhatsApp Us</a>
             </div>
