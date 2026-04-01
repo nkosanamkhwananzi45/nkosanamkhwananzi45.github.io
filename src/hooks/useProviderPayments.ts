@@ -10,7 +10,7 @@ export const useProviderPayments = () => {
   const fetchPayments = useCallback(async (providerId: string, status?: string) => {
     setLoading(true);
     try {
-      let query = supabase
+      let query = (supabase as any)
         .from('provider_payments')
         .select('*')
         .eq('provider_id', providerId)
