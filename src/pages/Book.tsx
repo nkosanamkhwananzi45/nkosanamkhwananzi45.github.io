@@ -62,7 +62,7 @@ const BookingPage = () => {
           amount,
           status: 'pending',
           payment_status: amount > 0 ? 'unpaid' : 'quote_requested',
-          user_id: user?.id || null,
+          user_id: user?.id,
         })
         .select()
         .single();
