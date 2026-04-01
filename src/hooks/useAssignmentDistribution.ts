@@ -41,7 +41,7 @@ export const useAssignmentDistribution = () => {
   const acceptAssignment = useCallback(async (assignmentId: string, providerId: string) => {
     setLoading(true);
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('assignments')
         .update({
           status: 'in_progress',
