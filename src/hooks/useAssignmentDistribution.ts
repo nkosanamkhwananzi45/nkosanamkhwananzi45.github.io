@@ -12,7 +12,7 @@ export const useAssignmentDistribution = () => {
     setLoading(true);
     setError(null);
     try {
-      let query = supabase
+      let query = (supabase as any)
         .from('assignments')
         .select('*')
         .eq('provider_id', providerId)
