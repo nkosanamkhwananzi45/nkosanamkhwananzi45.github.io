@@ -10,7 +10,7 @@ export const useProgressUpdates = () => {
   const fetchProgressUpdates = useCallback(async (assignmentId: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('progress_updates')
         .select('*')
         .eq('assignment_id', assignmentId)
