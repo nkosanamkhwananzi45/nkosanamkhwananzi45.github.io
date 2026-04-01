@@ -36,7 +36,7 @@ export const useProviderPayments = () => {
 
   const downloadPaymentStatement = useCallback(async (providerId: string, startDate: string, endDate: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('provider_payments')
         .select('*')
         .eq('provider_id', providerId)
