@@ -52,7 +52,7 @@ export const useProviderMessaging = () => {
       attachments?: string[]
     ) => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('messages')
           .insert([
             {

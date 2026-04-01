@@ -80,7 +80,7 @@ export const useProviderPayments = () => {
 
   const getPaymentSummary = useCallback(async (providerId: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('provider_payments')
         .select('amount, status')
         .eq('provider_id', providerId);

@@ -92,7 +92,7 @@ export const useAssignmentDistribution = () => {
       if (updateError) throw updateError;
 
       // Log rejection reason
-      await supabase.from('assignment_rejections').insert({
+      await (supabase as any).from('assignment_rejections').insert({
         assignment_id: assignmentId,
         provider_id: providerId,
         reason,

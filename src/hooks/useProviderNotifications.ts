@@ -52,7 +52,7 @@ export const useProviderNotifications = () => {
 
   const markAllAsRead = useCallback(async (providerId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notifications')
         .update({ is_read: true })
         .eq('provider_id', providerId)

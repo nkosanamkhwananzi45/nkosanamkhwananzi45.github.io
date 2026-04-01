@@ -68,7 +68,7 @@ export const useProgressUpdates = () => {
           .eq('id', assignmentId);
 
         // Notify client
-        await supabase.from('notifications').insert({
+        await (supabase as any).from('notifications').insert({
           type: 'assignment',
           title: 'Progress Update',
           message: `Your assignment has a new progress update: ${notes}`,
