@@ -59,7 +59,7 @@ export const useProgressUpdates = () => {
         setUpdates(prev => [data, ...prev]);
 
         // Update assignment status
-        await supabase
+        await (supabase as any)
           .from('assignments')
           .update({
             status,
