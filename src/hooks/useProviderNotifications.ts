@@ -11,7 +11,7 @@ export const useProviderNotifications = () => {
   const fetchNotifications = useCallback(async (providerId: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('notifications')
         .select('*')
         .eq('provider_id', providerId)
