@@ -34,7 +34,7 @@ export const useProviderNotifications = () => {
 
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notifications')
         .update({ is_read: true })
         .eq('id', notificationId);
