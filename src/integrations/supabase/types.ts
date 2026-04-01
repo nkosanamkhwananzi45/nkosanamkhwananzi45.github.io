@@ -74,6 +74,63 @@ export type Database = {
         }
         Relationships: []
       }
+      intakes: {
+        Row: {
+          admin_id: string | null
+          client_email: string
+          client_id: string | null
+          client_name: string
+          client_phone: string
+          created_at: string | null
+          created_by: string
+          id: string
+          notes: string | null
+          preferred_start_date: string
+          priority: string
+          required_skills: string[] | null
+          service_description: string
+          service_type: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          client_email: string
+          client_id?: string | null
+          client_name: string
+          client_phone: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          notes?: string | null
+          preferred_start_date: string
+          priority?: string
+          required_skills?: string[] | null
+          service_description: string
+          service_type: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          client_email?: string
+          client_id?: string | null
+          client_name?: string
+          client_phone?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          notes?: string | null
+          preferred_start_date?: string
+          priority?: string
+          required_skills?: string[] | null
+          service_description?: string
+          service_type?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
