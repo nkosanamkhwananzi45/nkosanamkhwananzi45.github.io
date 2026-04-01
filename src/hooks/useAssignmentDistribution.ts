@@ -80,7 +80,7 @@ export const useAssignmentDistribution = () => {
   const rejectAssignment = useCallback(async (assignmentId: string, providerId: string, reason: string) => {
     setLoading(true);
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('assignments')
         .update({
           status: 'assigned', // Reset to assigned so admin can reallocate
