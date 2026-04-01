@@ -27,7 +27,7 @@ export const useProviderMessaging = () => {
       }));
 
       // Mark as read
-      await supabase
+      await (supabase as any)
         .from('messages')
         .update({ is_read: true })
         .eq('recipient_id', providerId)
