@@ -10,7 +10,7 @@ export const useProviderMessaging = () => {
   const fetchConversation = useCallback(async (providerId: string, recipientId: string, assignmentId?: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('messages')
         .select('*')
         .or(
