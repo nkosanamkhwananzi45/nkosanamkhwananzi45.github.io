@@ -5,7 +5,7 @@ export interface Assignment {
   client_email: string;
   service_type: string;
   service_description: string;
-  status: 'assigned' | 'in_progress' | 'blocked' | 'completed';
+  status: string;
   start_date: string;
   deadline: string;
   created_at: string;
@@ -16,7 +16,7 @@ export interface ProgressUpdate {
   id: string;
   assignment_id: string;
   provider_id: string;
-  status: 'in_progress' | 'blocked' | 'completed';
+  status: string;
   notes: string;
   progress_percentage: number;
   created_at: string;
@@ -26,7 +26,7 @@ export interface ProgressUpdate {
 export interface Message {
   id: string;
   sender_id: string;
-  sender_type: 'provider' | 'client';
+  sender_type: string;
   sender_name: string;
   recipient_id: string;
   assignment_id?: string;
@@ -41,7 +41,7 @@ export interface ProviderPayment {
   provider_id: string;
   assignment_id: string;
   amount: number;
-  status: 'pending' | 'processed' | 'paid_out';
+  status: string;
   payment_date?: string;
   paid_out_date?: string;
   notes?: string;
@@ -51,7 +51,7 @@ export interface ProviderPayment {
 export interface Notification {
   id: string;
   provider_id: string;
-  type: 'assignment' | 'message' | 'payment' | 'deadline';
+  type: string;
   title: string;
   message: string;
   related_id?: string;
