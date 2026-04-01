@@ -53,7 +53,7 @@ export const useAssignmentDistribution = () => {
       if (updateError) throw updateError;
 
       // Create notification for client
-      await supabase.from('notifications').insert({
+      await (supabase as any).from('notifications').insert({
         user_id: '', // client_id
         type: 'assignment',
         title: 'Assignment Accepted',
