@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/provider';
 import { toast } from 'sonner';
 
@@ -10,7 +10,7 @@ export const useProviderMessaging = () => {
   const fetchConversation = useCallback(async (providerId: string, recipientId: string, assignmentId?: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('messages')
         .select('*')
         .or(
@@ -27,7 +27,7 @@ export const useProviderMessaging = () => {
       }));
 
       // Mark as read
-      await supabase
+      await (supabase as any)
         .from('messages')
         .update({ is_read: true })
         .eq('recipient_id', providerId)
@@ -52,7 +52,7 @@ export const useProviderMessaging = () => {
       attachments?: string[]
     ) => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('messages')
           .insert([
             {

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Notification } from '@/types/provider';
 import { toast } from 'sonner';
 
@@ -11,7 +11,7 @@ export const useProviderNotifications = () => {
   const fetchNotifications = useCallback(async (providerId: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('notifications')
         .select('*')
         .eq('provider_id', providerId)
@@ -34,7 +34,7 @@ export const useProviderNotifications = () => {
 
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notifications')
         .update({ is_read: true })
         .eq('id', notificationId);
@@ -52,7 +52,7 @@ export const useProviderNotifications = () => {
 
   const markAllAsRead = useCallback(async (providerId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notifications')
         .update({ is_read: true })
         .eq('provider_id', providerId)

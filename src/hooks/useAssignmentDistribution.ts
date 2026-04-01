@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Assignment } from '@/types/provider';
 import { toast } from 'sonner';
 
@@ -12,7 +12,7 @@ export const useAssignmentDistribution = () => {
     setLoading(true);
     setError(null);
     try {
-      let query = supabase
+      let query = (supabase as any)
         .from('assignments')
         .select('*')
         .eq('provider_id', providerId)
@@ -41,7 +41,7 @@ export const useAssignmentDistribution = () => {
   const acceptAssignment = useCallback(async (assignmentId: string, providerId: string) => {
     setLoading(true);
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('assignments')
         .update({
           status: 'in_progress',
@@ -53,7 +53,7 @@ export const useAssignmentDistribution = () => {
       if (updateError) throw updateError;
 
       // Create notification for client
-      await supabase.from('notifications').insert({
+      await (supabase as any).from('notifications').insert({
         user_id: '', // client_id
         type: 'assignment',
         title: 'Assignment Accepted',
@@ -80,7 +80,7 @@ export const useAssignmentDistribution = () => {
   const rejectAssignment = useCallback(async (assignmentId: string, providerId: string, reason: string) => {
     setLoading(true);
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('assignments')
         .update({
           status: 'assigned', // Reset to assigned so admin can reallocate
@@ -92,7 +92,7 @@ export const useAssignmentDistribution = () => {
       if (updateError) throw updateError;
 
       // Log rejection reason
-      await supabase.from('assignment_rejections').insert({
+      await (supabase as any).from('assignment_rejections').insert({
         assignment_id: assignmentId,
         provider_id: providerId,
         reason,

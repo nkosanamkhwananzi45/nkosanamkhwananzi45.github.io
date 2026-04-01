@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { ProviderPayment } from '@/types/provider';
 import { toast } from 'sonner';
 
@@ -10,7 +10,7 @@ export const useProviderPayments = () => {
   const fetchPayments = useCallback(async (providerId: string, status?: string) => {
     setLoading(true);
     try {
-      let query = supabase
+      let query = (supabase as any)
         .from('provider_payments')
         .select('*')
         .eq('provider_id', providerId)
@@ -36,7 +36,7 @@ export const useProviderPayments = () => {
 
   const downloadPaymentStatement = useCallback(async (providerId: string, startDate: string, endDate: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('provider_payments')
         .select('*')
         .eq('provider_id', providerId)
@@ -80,7 +80,7 @@ export const useProviderPayments = () => {
 
   const getPaymentSummary = useCallback(async (providerId: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('provider_payments')
         .select('amount, status')
         .eq('provider_id', providerId);

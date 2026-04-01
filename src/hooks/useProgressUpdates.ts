@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { ProgressUpdate } from '@/types/provider';
 import { toast } from 'sonner';
 
@@ -10,7 +10,7 @@ export const useProgressUpdates = () => {
   const fetchProgressUpdates = useCallback(async (assignmentId: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('progress_updates')
         .select('*')
         .eq('assignment_id', assignmentId)
@@ -38,7 +38,7 @@ export const useProgressUpdates = () => {
     ) => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('progress_updates')
           .insert([
             {
@@ -59,7 +59,7 @@ export const useProgressUpdates = () => {
         setUpdates(prev => [data, ...prev]);
 
         // Update assignment status
-        await supabase
+        await (supabase as any)
           .from('assignments')
           .update({
             status,
@@ -68,7 +68,7 @@ export const useProgressUpdates = () => {
           .eq('id', assignmentId);
 
         // Notify client
-        await supabase.from('notifications').insert({
+        await (supabase as any).from('notifications').insert({
           type: 'assignment',
           title: 'Progress Update',
           message: `Your assignment has a new progress update: ${notes}`,
