@@ -38,7 +38,7 @@ export const useProgressUpdates = () => {
     ) => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('progress_updates')
           .insert([
             {
