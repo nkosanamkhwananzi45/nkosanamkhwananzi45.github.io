@@ -46,7 +46,7 @@ const Dashboard = () => {
     fetchData();
   }, [user]);
 
-  if (authLoading || !user) return null;
+  if (authLoading || loading || !user) return null;
 
   return (
     <Layout>
