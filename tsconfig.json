@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "strictNullChecks": true,
-    "skipLibCheck": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "allowJs": true,
+    "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
