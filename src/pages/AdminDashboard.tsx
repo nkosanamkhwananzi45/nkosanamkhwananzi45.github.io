@@ -35,7 +35,6 @@ interface BookingData {
 
 const AdminDashboard = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     totalIntakes: 0,
     totalBookings: 0,
