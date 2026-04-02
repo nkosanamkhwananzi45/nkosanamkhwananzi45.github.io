@@ -1,11 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 async function md5(input: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(input)
   const { createHash } = await import('https://deno.land/std@0.177.0/node/crypto.ts')
   const hash = createHash('md5')
-  hash.update(data)
+  hash.update(input)
   return hash.digest('hex') as string
 }
 
@@ -22,7 +20,6 @@ Deno.serve(async (req) => {
       data[key] = value
     })
 
-    // Verify signature
     const receivedSignature = data.signature
     delete data.signature
 
@@ -45,7 +42,6 @@ Deno.serve(async (req) => {
       return new Response('Invalid signature', { status: 400 })
     }
 
-    // Verify with PayFast server
     const verifyResponse = await fetch('https://www.payfast.co.za/eng/query/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -58,7 +54,6 @@ Deno.serve(async (req) => {
       return new Response('Validation failed', { status: 400 })
     }
 
-    // Update booking in database
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
@@ -82,8 +77,9 @@ Deno.serve(async (req) => {
     }
 
     return new Response('OK', { status: 200 })
-  } catch (error) {
-    console.error('IPN error:', error)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('IPN error:', message)
     return new Response('Server error', { status: 500 })
   }
 })
