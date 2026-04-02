@@ -27,14 +27,9 @@ const statusIcon: Record<string, React.ReactNode> = {
 
 const Dashboard = () => {
   const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ full_name: string | null }>({ full_name: null });
-
-  useEffect(() => {
-    if (!authLoading && !user) navigate("/login");
-  }, [authLoading, user, navigate]);
 
   useEffect(() => {
     if (!user) return;
