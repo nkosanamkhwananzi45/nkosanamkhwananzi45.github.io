@@ -1,39 +1,13 @@
 import { corsHeaders } from '@supabase/supabase-js/cors'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const PAYFAST_URL = 'https://www.payfast.co.za/eng/process'
-
-function generateSignature(data: Record<string, string>, passphrase?: string): string {
-  const params = Object.keys(data)
-    .filter(key => data[key] !== '' && data[key] !== undefined)
-    .sort()
-    .map(key => `${key}=${encodeURIComponent(data[key]).replace(/%20/g, '+')}`)
-    .join('&')
-
-  const signatureString = passphrase ? `${params}&passphrase=${encodeURIComponent(passphrase)}` : params
-
-  const encoder = new TextEncoder()
-  const dataBuffer = encoder.encode(signatureString)
-  const hashBuffer = new Uint8Array(
-    // @ts-ignore Deno crypto
-    await crypto.subtle.digest('MD5', dataBuffer) as ArrayBuffer
-  )
-  // MD5 not available via subtle in all runtimes, use a manual approach
-  return ''
-}
-
-// MD5 implementation for Deno
 async function md5(input: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(input)
-  // Use a simple MD5 via importing
   const { createHash } = await import('https://deno.land/std@0.177.0/node/crypto.ts')
   const hash = createHash('md5')
-  hash.update(data)
+  hash.update(input)
   return hash.digest('hex') as string
 }
 
-async function generateMD5Signature(data: Record<string, string>, passphrase?: string): Promise<string> {
+async function generateSignature(data: Record<string, string>, passphrase?: string): Promise<string> {
   const params = Object.keys(data)
     .filter(key => data[key] !== '' && data[key] !== undefined)
     .sort()
@@ -78,7 +52,7 @@ Deno.serve(async (req) => {
       name_first: firstName || '',
     }
 
-    const signature = await generateMD5Signature(paymentData, passphrase || undefined)
+    const signature = await generateSignature(paymentData, passphrase || undefined)
     paymentData.signature = signature
 
     const queryString = Object.entries(paymentData)
@@ -87,13 +61,14 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        redirectUrl: `${PAYFAST_URL}?${queryString}`,
+        redirectUrl: `https://www.payfast.co.za/eng/process?${queryString}`,
         paymentData,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
