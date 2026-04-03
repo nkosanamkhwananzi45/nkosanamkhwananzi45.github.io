@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { DollarSign, BookOpen, AlertCircle, TrendingUp, Calendar, Clock } from 'lucide-react';
+import { DollarSign, BookOpen, AlertCircle, TrendingUp, Calendar, Clock, Users } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ import { BookingAllocation } from '@/components/BookingAllocation';
 import { DeadlineMonitoring } from '@/components/DeadlineMonitoring';
 import { RevenueReporting } from '@/components/RevenueReporting';
 import { PaymentTracking } from '@/components/PaymentTracking';
+import { UserManagement } from '@/components/UserManagement';
 import Layout from '@/components/Layout';
 
 interface DashboardStats {
@@ -220,12 +221,13 @@ const AdminDashboard = () => {
 
           {/* Management Sections */}
           <Tabs defaultValue="payments" className="mt-8">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="payments">Payments</TabsTrigger>
               <TabsTrigger value="intakes">Intakes</TabsTrigger>
               <TabsTrigger value="bookings">Allocate</TabsTrigger>
               <TabsTrigger value="deadlines">Deadlines</TabsTrigger>
               <TabsTrigger value="reports">Reports</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
             </TabsList>
 
             <TabsContent value="payments" className="mt-4">
@@ -246,6 +248,10 @@ const AdminDashboard = () => {
 
             <TabsContent value="reports" className="mt-4">
               <RevenueReporting />
+            </TabsContent>
+
+            <TabsContent value="users" className="mt-4">
+              <UserManagement />
             </TabsContent>
           </Tabs>
         </div>
