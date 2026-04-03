@@ -13,8 +13,14 @@ const Navbar = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isProvider, setIsProvider] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === "/";
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   useEffect(() => {
     if (!user) { setIsAdmin(false); setIsProvider(false); return; }
