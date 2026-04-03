@@ -1,17 +1,33 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, User } from "lucide-react";
+import { Menu, X, ChevronDown, User, Shield, Briefcase } from "lucide-react";
 import { services } from "@/data/services";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isProvider, setIsProvider] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); setIsProvider(false); return; }
+    const check = async () => {
+      const [admin, provider] = await Promise.all([
+        supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' as const }),
+        supabase.rpc('has_role', { _user_id: user.id, _role: 'provider' as const }),
+      ]);
+      setIsAdmin(!!admin.data);
+      setIsProvider(!!provider.data);
+    };
+    check();
+  }, [user]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -61,9 +77,21 @@ const Navbar = () => {
           <Link to="/about" className="text-sm font-semibold hover:opacity-80 transition-opacity">About</Link>
           <Link to="/contact" className="text-sm font-semibold hover:opacity-80 transition-opacity">Contact</Link>
           {user ? (
-            <Link to="/dashboard" className="ml-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
-              <User className="w-4 h-4" /> Dashboard
-            </Link>
+            <>
+              {isAdmin && (
+                <Link to="/admin" className="text-sm font-semibold hover:opacity-80 transition-opacity flex items-center gap-1">
+                  <Shield className="w-3.5 h-3.5" /> Admin
+                </Link>
+              )}
+              {isProvider && (
+                <Link to="/provider" className="text-sm font-semibold hover:opacity-80 transition-opacity flex items-center gap-1">
+                  <Briefcase className="w-3.5 h-3.5" /> Provider
+                </Link>
+              )}
+              <Link to="/dashboard" className="ml-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+                <User className="w-4 h-4" /> Dashboard
+              </Link>
+            </>
           ) : (
             <>
               <Link to="/login" className="text-sm font-semibold hover:opacity-80 transition-opacity">Sign In</Link>
@@ -101,7 +129,19 @@ const Navbar = () => {
             <Link to="/contact" className="py-3 px-4 text-foreground font-semibold rounded-lg hover:bg-muted">Contact</Link>
             <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
               {user ? (
-                <Link to="/dashboard" className="text-center py-3 rounded-lg bg-primary text-primary-foreground font-bold">Dashboard</Link>
+                <>
+                  <Link to="/dashboard" className="text-center py-3 rounded-lg bg-primary text-primary-foreground font-bold">Dashboard</Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="text-center py-3 rounded-lg border border-border text-foreground font-bold flex items-center justify-center gap-2">
+                      <Shield className="w-4 h-4" /> Admin
+                    </Link>
+                  )}
+                  {isProvider && (
+                    <Link to="/provider" className="text-center py-3 rounded-lg border border-border text-foreground font-bold flex items-center justify-center gap-2">
+                      <Briefcase className="w-4 h-4" /> Provider
+                    </Link>
+                  )}
+                </>
               ) : (
                 <>
                   <Link to="/login" className="text-center py-3 rounded-lg bg-primary text-primary-foreground font-bold">Sign In</Link>
