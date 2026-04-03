@@ -1,17 +1,33 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, User } from "lucide-react";
+import { Menu, X, ChevronDown, User, Shield, Briefcase } from "lucide-react";
 import { services } from "@/data/services";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isProvider, setIsProvider] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); setIsProvider(false); return; }
+    const check = async () => {
+      const [admin, provider] = await Promise.all([
+        supabase.rpc('has_role', { _user_id: user.id, _role: 'admin' as const }),
+        supabase.rpc('has_role', { _user_id: user.id, _role: 'provider' as const }),
+      ]);
+      setIsAdmin(!!admin.data);
+      setIsProvider(!!provider.data);
+    };
+    check();
+  }, [user]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
