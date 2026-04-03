@@ -221,12 +221,13 @@ const AdminDashboard = () => {
 
           {/* Management Sections */}
           <Tabs defaultValue="payments" className="mt-8">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="payments">Payments</TabsTrigger>
               <TabsTrigger value="intakes">Intakes</TabsTrigger>
               <TabsTrigger value="bookings">Allocate</TabsTrigger>
               <TabsTrigger value="deadlines">Deadlines</TabsTrigger>
               <TabsTrigger value="reports">Reports</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
             </TabsList>
 
             <TabsContent value="payments" className="mt-4">
