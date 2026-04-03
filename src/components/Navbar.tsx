@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ChevronDown, User, Shield, Briefcase } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, ChevronDown, User, Shield, Briefcase, LogOut } from "lucide-react";
 import { services } from "@/data/services";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,8 +13,14 @@ const Navbar = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isProvider, setIsProvider] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === "/";
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   useEffect(() => {
     if (!user) { setIsAdmin(false); setIsProvider(false); return; }
@@ -88,9 +94,12 @@ const Navbar = () => {
                   <Briefcase className="w-3.5 h-3.5" /> Provider
                 </Link>
               )}
-              <Link to="/dashboard" className="ml-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+              <Link to="/dashboard" className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
                 <User className="w-4 h-4" /> Dashboard
               </Link>
+              <button onClick={handleSignOut} className="px-3 py-2.5 rounded-lg border border-border text-sm font-semibold hover:bg-muted transition-colors flex items-center gap-1">
+                <LogOut className="w-3.5 h-3.5" /> Sign Out
+              </button>
             </>
           ) : (
             <>
@@ -141,6 +150,9 @@ const Navbar = () => {
                       <Briefcase className="w-4 h-4" /> Provider
                     </Link>
                   )}
+                  <button onClick={handleSignOut} className="text-center py-3 rounded-lg border border-destructive text-destructive font-bold flex items-center justify-center gap-2">
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
                 </>
               ) : (
                 <>
