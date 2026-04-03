@@ -11,6 +11,7 @@ import { BookingAllocation } from '@/components/BookingAllocation';
 import { DeadlineMonitoring } from '@/components/DeadlineMonitoring';
 import { RevenueReporting } from '@/components/RevenueReporting';
 import { PaymentTracking } from '@/components/PaymentTracking';
+import { UserManagement } from '@/components/UserManagement';
 import Layout from '@/components/Layout';
 
 interface DashboardStats {
