@@ -77,9 +77,21 @@ const Navbar = () => {
           <Link to="/about" className="text-sm font-semibold hover:opacity-80 transition-opacity">About</Link>
           <Link to="/contact" className="text-sm font-semibold hover:opacity-80 transition-opacity">Contact</Link>
           {user ? (
-            <Link to="/dashboard" className="ml-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
-              <User className="w-4 h-4" /> Dashboard
-            </Link>
+            <>
+              {isAdmin && (
+                <Link to="/admin" className="text-sm font-semibold hover:opacity-80 transition-opacity flex items-center gap-1">
+                  <Shield className="w-3.5 h-3.5" /> Admin
+                </Link>
+              )}
+              {isProvider && (
+                <Link to="/provider" className="text-sm font-semibold hover:opacity-80 transition-opacity flex items-center gap-1">
+                  <Briefcase className="w-3.5 h-3.5" /> Provider
+                </Link>
+              )}
+              <Link to="/dashboard" className="ml-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+                <User className="w-4 h-4" /> Dashboard
+              </Link>
+            </>
           ) : (
             <>
               <Link to="/login" className="text-sm font-semibold hover:opacity-80 transition-opacity">Sign In</Link>
