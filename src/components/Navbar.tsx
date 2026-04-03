@@ -129,7 +129,19 @@ const Navbar = () => {
             <Link to="/contact" className="py-3 px-4 text-foreground font-semibold rounded-lg hover:bg-muted">Contact</Link>
             <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border">
               {user ? (
-                <Link to="/dashboard" className="text-center py-3 rounded-lg bg-primary text-primary-foreground font-bold">Dashboard</Link>
+                <>
+                  <Link to="/dashboard" className="text-center py-3 rounded-lg bg-primary text-primary-foreground font-bold">Dashboard</Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="text-center py-3 rounded-lg border border-border text-foreground font-bold flex items-center justify-center gap-2">
+                      <Shield className="w-4 h-4" /> Admin
+                    </Link>
+                  )}
+                  {isProvider && (
+                    <Link to="/provider" className="text-center py-3 rounded-lg border border-border text-foreground font-bold flex items-center justify-center gap-2">
+                      <Briefcase className="w-4 h-4" /> Provider
+                    </Link>
+                  )}
+                </>
               ) : (
                 <>
                   <Link to="/login" className="text-center py-3 rounded-lg bg-primary text-primary-foreground font-bold">Sign In</Link>
