@@ -150,6 +150,9 @@ const Navbar = () => {
                       <Briefcase className="w-4 h-4" /> Provider
                     </Link>
                   )}
+                  <button onClick={handleSignOut} className="text-center py-3 rounded-lg border border-destructive text-destructive font-bold flex items-center justify-center gap-2">
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
                 </>
               ) : (
                 <>
