@@ -153,8 +153,8 @@ export const services: ServiceCategory[] = [
     packages: [
       {
         name: "Single Session",
-        price: 300,
-        priceLabel: "R300",
+        price: 600,
+        priceLabel: "R600",
         features: ["1-hour tutoring session", "Any subject/module", "Personalised approach", "WhatsApp follow-up"],
       },
       {
