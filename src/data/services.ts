@@ -148,7 +148,7 @@ export const services: ServiceCategory[] = [
     description: "One-on-one and group tutoring sessions with examination preparation across all fields.",
     highlight: "All Fields",
     icon: "PenTool",
-    startingPrice: "R300",
+    startingPrice: "R600",
     heroTagline: "Personalised Learning, Real Results",
     packages: [
       {
