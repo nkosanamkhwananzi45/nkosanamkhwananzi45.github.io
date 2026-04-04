@@ -90,7 +90,7 @@ export const services: ServiceCategory[] = [
     description: "Expert guidance for dissertations, theses, proposals, and academic writing at all levels.",
     highlight: "PhD to Honours",
     icon: "BookOpen",
-    startingPrice: "Custom Quote",
+    startingPrice: "R600",
     heroTagline: "Expert Research Guidance at Every Level",
     packages: [
       {
