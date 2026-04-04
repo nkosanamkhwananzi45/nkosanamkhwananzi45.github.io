@@ -129,8 +129,13 @@ const HomePage = () => (
     {/* Why Choose Us */}
     <section className="py-16 md:py-24 bg-muted/50">
       <div className="container">
-        <motion.h2 {...fadeInUp} transition={{ duration: 0.5 }} className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-12">Why Choose Asante Andi?</motion.h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        <motion.div {...fadeInUp} transition={{ duration: 0.5 }} className="text-center mb-4">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">Why Choose Asante Andi?</h2>
+        </motion.div>
+        <motion.p {...fadeInUp} transition={{ duration: 0.5, delay: 0.1 }} className="text-center text-muted-foreground max-w-2xl mx-auto mb-12">
+          We are committed to supporting students with integrity, quality, and academic excellence. Our services align with university standards while empowering students to succeed independently.
+        </motion.p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
           {trustFeatures.map((f, i) => (
             <motion.div key={i} {...fadeInUp} transition={{ delay: i * 0.08, duration: 0.5 }}
               className="bg-card rounded-xl p-6 border border-border">
@@ -140,8 +145,11 @@ const HomePage = () => (
             </motion.div>
           ))}
         </div>
+        <motion.p {...fadeInUp} transition={{ duration: 0.5 }} className="text-center text-lg font-display font-bold text-primary italic">
+          "We don't just assist you to submit — we prepare you to succeed."
+        </motion.p>
 
-        <motion.h3 {...fadeInUp} transition={{ duration: 0.5 }} className="text-2xl font-display font-bold text-foreground text-center mb-8">What Our Students Say</motion.h3>
+        <motion.h3 {...fadeInUp} transition={{ duration: 0.5 }} className="text-2xl font-display font-bold text-foreground text-center mt-16 mb-8">What Our Students Say</motion.h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {testimonials.map((t, i) => (
             <motion.div key={i} {...fadeInUp} transition={{ delay: i * 0.1, duration: 0.5 }} className="bg-card rounded-xl p-6 border border-border">
