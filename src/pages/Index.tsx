@@ -15,12 +15,12 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 const trustFeatures = [
-  { icon: <Shield className="w-6 h-6" />, title: "Ethical Guidance", desc: "Academic integrity at the core of everything we do" },
-  { icon: <Clock className="w-6 h-6" />, title: "Quick Turnaround", desc: "Fast, reliable delivery meeting your deadlines" },
-  { icon: <Star className="w-6 h-6" />, title: "Expert Support", desc: "Qualified professionals across all academic fields" },
-  { icon: <Heart className="w-6 h-6" />, title: "Student-Centred", desc: "Personalised approach to every learner's needs" },
-  { icon: <Zap className="w-6 h-6" />, title: "Affordable Pricing", desc: "Quality academic support accessible to all" },
-  { icon: <CheckCircle className="w-6 h-6" />, title: "Proven Results", desc: "500+ students supported across 10+ institutions" },
+  { icon: <Shield className="w-6 h-6" />, title: "Academic Integrity", desc: "We uphold the highest standards of academic honesty, ensuring all work is ethical and compliant with institutional policies." },
+  { icon: <CheckCircle className="w-6 h-6" />, title: "Plagiarism-Free Work", desc: "All documents are developed from original research and writing, properly referenced using approved academic styles." },
+  { icon: <Zap className="w-6 h-6" />, title: "Turnitin-Ready", desc: "Our work is prepared with plagiarism detection systems in mind, helping students achieve acceptable similarity indexes." },
+  { icon: <Star className="w-6 h-6" />, title: "Responsible AI Use", desc: "Any use of AI tools is responsible, transparent, and in line with university guidelines — no misuse or over-reliance." },
+  { icon: <Heart className="w-6 h-6" />, title: "Qualified Experts", desc: "Our team includes graduates with Honours, Master's, and PhD qualifications across disciplines." },
+  { icon: <Clock className="w-6 h-6" />, title: "Student Empowerment", desc: "We equip students with knowledge and skills to understand and confidently present their research." },
 ];
 
 const testimonials = [
