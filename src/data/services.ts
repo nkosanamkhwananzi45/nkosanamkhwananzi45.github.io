@@ -32,14 +32,14 @@ export const services: ServiceCategory[] = [
     packages: [
       {
         name: "2 Assignments",
-        price: 550,
-        priceLabel: "R550",
+        price: 600,
+        priceLabel: "R600",
         features: ["2 assignment submissions", "All institutions supported", "Plagiarism-free guidance", "WhatsApp support"],
       },
       {
         name: "4 Assignments",
-        price: 800,
-        priceLabel: "R800",
+        price: 900,
+        priceLabel: "R900",
         badge: "Most Popular",
         features: ["4 assignment submissions", "All institutions supported", "Plagiarism-free guidance", "Priority WhatsApp support", "Free referencing check"],
       },
