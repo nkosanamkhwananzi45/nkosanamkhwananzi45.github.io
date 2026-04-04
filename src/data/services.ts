@@ -123,7 +123,7 @@ export const services: ServiceCategory[] = [
     description: "Interactive workshops for skills development, career guidance, and professional growth.",
     highlight: "Group Sessions",
     icon: "Users",
-    startingPrice: "R200",
+    startingPrice: "R600",
     heroTagline: "Interactive Learning Experiences",
     packages: [
       {
