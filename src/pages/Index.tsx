@@ -15,12 +15,12 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 const trustFeatures = [
-  { icon: <Shield className="w-6 h-6" />, title: "Ethical Guidance", desc: "Academic integrity at the core of everything we do" },
-  { icon: <Clock className="w-6 h-6" />, title: "Quick Turnaround", desc: "Fast, reliable delivery meeting your deadlines" },
-  { icon: <Star className="w-6 h-6" />, title: "Expert Support", desc: "Qualified professionals across all academic fields" },
-  { icon: <Heart className="w-6 h-6" />, title: "Student-Centred", desc: "Personalised approach to every learner's needs" },
-  { icon: <Zap className="w-6 h-6" />, title: "Affordable Pricing", desc: "Quality academic support accessible to all" },
-  { icon: <CheckCircle className="w-6 h-6" />, title: "Proven Results", desc: "500+ students supported across 10+ institutions" },
+  { icon: <Shield className="w-6 h-6" />, title: "Academic Integrity", desc: "We uphold the highest standards of academic honesty, ensuring all work is ethical and compliant with institutional policies." },
+  { icon: <CheckCircle className="w-6 h-6" />, title: "Plagiarism-Free Work", desc: "All documents are developed from original research and writing, properly referenced using approved academic styles." },
+  { icon: <Zap className="w-6 h-6" />, title: "Turnitin-Ready", desc: "Our work is prepared with plagiarism detection systems in mind, helping students achieve acceptable similarity indexes." },
+  { icon: <Star className="w-6 h-6" />, title: "Responsible AI Use", desc: "Any use of AI tools is responsible, transparent, and in line with university guidelines — no misuse or over-reliance." },
+  { icon: <Heart className="w-6 h-6" />, title: "Qualified Experts", desc: "Our team includes graduates with Honours, Master's, and PhD qualifications across disciplines." },
+  { icon: <Clock className="w-6 h-6" />, title: "Student Empowerment", desc: "We equip students with knowledge and skills to understand and confidently present their research." },
 ];
 
 const testimonials = [
@@ -129,8 +129,13 @@ const HomePage = () => (
     {/* Why Choose Us */}
     <section className="py-16 md:py-24 bg-muted/50">
       <div className="container">
-        <motion.h2 {...fadeInUp} transition={{ duration: 0.5 }} className="text-3xl md:text-4xl font-display font-bold text-foreground text-center mb-12">Why Choose Asante Andi?</motion.h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        <motion.div {...fadeInUp} transition={{ duration: 0.5 }} className="text-center mb-4">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">Why Choose Asante Andi?</h2>
+        </motion.div>
+        <motion.p {...fadeInUp} transition={{ duration: 0.5, delay: 0.1 }} className="text-center text-muted-foreground max-w-2xl mx-auto mb-12">
+          We are committed to supporting students with integrity, quality, and academic excellence. Our services align with university standards while empowering students to succeed independently.
+        </motion.p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
           {trustFeatures.map((f, i) => (
             <motion.div key={i} {...fadeInUp} transition={{ delay: i * 0.08, duration: 0.5 }}
               className="bg-card rounded-xl p-6 border border-border">
@@ -140,8 +145,11 @@ const HomePage = () => (
             </motion.div>
           ))}
         </div>
+        <motion.p {...fadeInUp} transition={{ duration: 0.5 }} className="text-center text-lg font-display font-bold text-primary italic">
+          "We don't just assist you to submit — we prepare you to succeed."
+        </motion.p>
 
-        <motion.h3 {...fadeInUp} transition={{ duration: 0.5 }} className="text-2xl font-display font-bold text-foreground text-center mb-8">What Our Students Say</motion.h3>
+        <motion.h3 {...fadeInUp} transition={{ duration: 0.5 }} className="text-2xl font-display font-bold text-foreground text-center mt-16 mb-8">What Our Students Say</motion.h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {testimonials.map((t, i) => (
             <motion.div key={i} {...fadeInUp} transition={{ delay: i * 0.1, duration: 0.5 }} className="bg-card rounded-xl p-6 border border-border">
