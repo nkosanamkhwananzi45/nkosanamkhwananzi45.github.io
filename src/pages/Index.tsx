@@ -76,7 +76,7 @@ const HomePage = () => (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           {[
             { value: "500+", label: "Students Supported" },
-            { value: "6", label: "Service Categories" },
+            { value: "From R600", label: "Starting Price" },
             { value: "10+", label: "Institutions" },
             { value: "Fast", label: "Turnaround" },
           ].map(stat => (
