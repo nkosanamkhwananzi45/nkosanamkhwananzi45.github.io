@@ -64,14 +64,14 @@ export const services: ServiceCategory[] = [
     packages: [
       {
         name: "5-Month Teams Access",
-        price: 250,
-        priceLabel: "R250",
+        price: 600,
+        priceLabel: "R600",
         features: ["5 months Teams access", "Tue–Thu sessions (21:00–22:00)", "WhatsApp Q&A group", "Community vacancy updates"],
       },
       {
         name: "Full Year Teams Access",
-        price: 500,
-        priceLabel: "R500",
+        price: 900,
+        priceLabel: "R900",
         badge: "Best Value",
         features: ["12 months Teams access", "Tue–Thu sessions (21:00–22:00)", "WhatsApp Q&A group", "Free CV revamp ×2", "Community vacancy updates", "Small group workshops"],
       },
