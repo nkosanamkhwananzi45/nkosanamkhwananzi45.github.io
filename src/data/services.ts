@@ -59,7 +59,7 @@ export const services: ServiceCategory[] = [
     description: "Comprehensive training for ECD Level 4 & 5 practitioners with live Teams sessions.",
     highlight: "Live Sessions",
     icon: "Baby",
-    startingPrice: "R250",
+    startingPrice: "R600",
     heroTagline: "Empowering Early Childhood Practitioners",
     packages: [
       {
