@@ -128,14 +128,14 @@ export const services: ServiceCategory[] = [
     packages: [
       {
         name: "Single Workshop",
-        price: 200,
-        priceLabel: "R200",
+        price: 600,
+        priceLabel: "R600",
         features: ["3-hour interactive session", "Workshop materials included", "Certificate of attendance", "WhatsApp follow-up"],
       },
       {
         name: "Workshop Series (4)",
-        price: 650,
-        priceLabel: "R650",
+        price: 900,
+        priceLabel: "R900",
         badge: "Best Value",
         features: ["4 workshop sessions", "All materials included", "Certificate of completion", "Group WhatsApp support", "Networking opportunities"],
       },
