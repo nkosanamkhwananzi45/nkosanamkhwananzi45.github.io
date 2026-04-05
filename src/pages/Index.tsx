@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { GraduationCap, BookOpen, Baby, Users, PenTool, Briefcase, Star, CheckCircle, Zap, Shield, Clock, Heart } from "lucide-react";
+import { GraduationCap, BookOpen, Baby, Users, PenTool, Briefcase, Star, CheckCircle, Zap, Shield, Clock, Heart, FlaskConical } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { services, institutions } from "@/data/services";
 import Layout from "@/components/Layout";
 import heroBg from "@/assets/hero-bg.jpg";
