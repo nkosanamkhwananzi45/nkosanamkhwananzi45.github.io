@@ -60,7 +60,7 @@ const ContactPage = () => (
           <div className="bg-card rounded-xl border border-border p-6">
             <MapPin className="w-6 h-6 text-gold mb-2" />
             <h3 className="font-display font-bold text-foreground mb-1">Location</h3>
-            <p className="text-sm text-muted-foreground">Centurion, South Africa, 0157</p>
+            <p className="text-sm text-muted-foreground">No. 2151 Moretlwa Street, Tlhabane, Fox Lake, Unit B, Rustenburg 0308, South Africa</p>
           </div>
           <div className="bg-card rounded-xl border border-border p-6">
             <Clock className="w-6 h-6 text-gold mb-2" />
