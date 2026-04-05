@@ -31,18 +31,13 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-select',
-            '@radix-ui/react-accordion',
-          ],
-          'vendor-utils': ['clsx', 'tailwind-merge', 'class-variance-authority'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-supabase': ['@supabase/supabase-js'],
-          'vendor-motion': ['framer-motion'],
+        manualChunks(id) {
+          if (id.includes('react-router-dom') || id.includes('react-dom') || (id.includes('/react/') && !id.includes('react-query'))) return 'vendor-react';
+          if (id.includes('@radix-ui')) return 'vendor-ui';
+          if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) return 'vendor-utils';
+          if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core')) return 'vendor-query';
+          if (id.includes('@supabase')) return 'vendor-supabase';
+          if (id.includes('framer-motion')) return 'vendor-motion';
         },
       },
     },
