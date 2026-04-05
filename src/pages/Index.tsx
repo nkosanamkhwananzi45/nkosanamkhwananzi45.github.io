@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { GraduationCap, BookOpen, Baby, Users, PenTool, Briefcase, Star, CheckCircle, Zap, Shield, Clock, Heart } from "lucide-react";
+import { GraduationCap, BookOpen, Baby, Users, PenTool, Briefcase, Star, CheckCircle, Zap, Shield, Clock, Heart, FlaskConical } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { services, institutions } from "@/data/services";
 import Layout from "@/components/Layout";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -15,12 +16,24 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 const trustFeatures = [
-  { icon: <Shield className="w-6 h-6" />, title: "Academic Integrity", desc: "We uphold the highest standards of academic honesty, ensuring all work is ethical and compliant with institutional policies." },
-  { icon: <CheckCircle className="w-6 h-6" />, title: "Plagiarism-Free Work", desc: "All documents are developed from original research and writing, properly referenced using approved academic styles." },
-  { icon: <Zap className="w-6 h-6" />, title: "Turnitin-Ready", desc: "Our work is prepared with plagiarism detection systems in mind, helping students achieve acceptable similarity indexes." },
-  { icon: <Star className="w-6 h-6" />, title: "Responsible AI Use", desc: "Any use of AI tools is responsible, transparent, and in line with university guidelines — no misuse or over-reliance." },
-  { icon: <Heart className="w-6 h-6" />, title: "Qualified Experts", desc: "Our team includes graduates with Honours, Master's, and PhD qualifications across disciplines." },
-  { icon: <Clock className="w-6 h-6" />, title: "Student Empowerment", desc: "We equip students with knowledge and skills to understand and confidently present their research." },
+  { icon: <Shield className="w-6 h-6" />, title: "Commitment to Academic Integrity", desc: "We uphold the highest standards of academic honesty. Our support is structured to guide and assist students, ensuring that all work remains ethical and compliant with institutional policies." },
+  { icon: <CheckCircle className="w-6 h-6" />, title: "Plagiarism-Free Work", desc: "All documents are carefully developed from original research and writing. We ensure that content is free from plagiarism and properly referenced using approved academic styles." },
+  { icon: <Zap className="w-6 h-6" />, title: "Turnitin-Ready Submissions", desc: "Our work is prepared with plagiarism detection systems such as Turnitin in mind. We aim to help students achieve acceptable similarity indexes as required by their institutions." },
+  { icon: <Star className="w-6 h-6" />, title: "Responsible Use of AI Tools", desc: "We recognize the growing role of AI in academia. Our approach ensures that any use of AI tools is responsible, transparent, and in line with university guidelines, avoiding misuse or over-reliance." },
+  { icon: <Heart className="w-6 h-6" />, title: "Qualified Academic Experts", desc: "Our team consists of experienced professionals, including graduates with Honours, Master's, and PhD qualifications, who understand academic expectations across disciplines." },
+  { icon: <FlaskConical className="w-6 h-6" />, title: "Research-Based Approach", desc: "We emphasize critical thinking, proper methodology, and evidence-based research to ensure that all work meets postgraduate academic standards." },
+  { icon: <Clock className="w-6 h-6" />, title: "Student Empowerment", desc: "Beyond delivering quality work, we aim to equip students with the knowledge and skills needed to understand and confidently present their research." },
+];
+
+const faqs = [
+  { q: "What services does Asante Andi Consulting offer?", a: "We offer academic support (assignments, tutoring, exam prep), ECD online training, research & writing support (proposals, dissertations, journal articles), workshops & training, and professional consultation — all tailored for South African students and institutions." },
+  { q: "How much do your services cost?", a: "All our services start from R600. We offer tiered packages to suit different needs — from single assignments to full-semester support. Visit our Pricing page for detailed breakdowns." },
+  { q: "Which institutions do you support?", a: "We support students from SANTS, UNISA, University of Johannesburg, Wits, UCT, UKZN, Stadio, NWU, and 15+ other South African universities and colleges." },
+  { q: "Is your work plagiarism-free?", a: "Absolutely. All work is developed from original research, properly referenced using approved academic styles, and prepared with Turnitin and other plagiarism detection systems in mind." },
+  { q: "Do you use AI tools in your work?", a: "We recognise the growing role of AI in academia. Any use of AI tools is responsible, transparent, and in line with university guidelines — we never encourage misuse or over-reliance." },
+  { q: "How do I get started?", a: "Simply click 'Book a Service' to choose your package, or WhatsApp us on 076 088 4005 for a quick consultation. We'll guide you through the process step by step." },
+  { q: "What qualifications do your team members have?", a: "Our team includes experienced professionals with Honours, Master's, and PhD qualifications across multiple disciplines, ensuring expert-level support for any academic need." },
+  { q: "How fast is the turnaround?", a: "Turnaround times vary by service and complexity. We pride ourselves on fast delivery without compromising quality. Discuss your deadline with us and we'll work to meet it." },
 ];
 
 const testimonials = [
@@ -159,6 +172,30 @@ const HomePage = () => (
             </motion.div>
           ))}
         </div>
+      </div>
+    </section>
+
+    {/* FAQ */}
+    <section className="py-16 md:py-24">
+      <div className="container">
+        <motion.div {...fadeInUp} transition={{ duration: 0.5 }} className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-3">Frequently Asked Questions</h2>
+          <p className="text-muted-foreground max-w-lg mx-auto">Quick answers to the questions we hear most from students and professionals.</p>
+        </motion.div>
+        <motion.div {...fadeInUp} transition={{ duration: 0.5, delay: 0.1 }} className="max-w-3xl mx-auto">
+          <Accordion type="single" collapsible className="w-full">
+            {faqs.map((faq, i) => (
+              <AccordionItem key={i} value={`faq-${i}`} className="border-border">
+                <AccordionTrigger className="text-left font-display font-semibold text-foreground hover:text-primary hover:no-underline">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </motion.div>
       </div>
     </section>
 
