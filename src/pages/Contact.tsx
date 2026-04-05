@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Clock, MessageCircle, Facebook } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, MessageCircle, Facebook, Instagram, Linkedin } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const ContactPage = () => (
