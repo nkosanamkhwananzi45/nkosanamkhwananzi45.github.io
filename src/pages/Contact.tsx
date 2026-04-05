@@ -29,10 +29,30 @@ const ContactPage = () => (
             <h3 className="font-display font-bold text-foreground mb-1">Email</h3>
             <p className="text-sm text-muted-foreground">info@asanteandi.co.za</p>
           </a>
-          <a href="https://www.facebook.com/AsanteAndiConsulting" target="_blank" rel="noopener noreferrer" className="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow">
+          <a href="https://www.facebook.com/reacademysa" target="_blank" rel="noopener noreferrer" className="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow">
             <Facebook className="w-8 h-8 text-primary mb-3" />
             <h3 className="font-display font-bold text-foreground mb-1">Facebook</h3>
             <p className="text-sm text-muted-foreground">Asante Andi Consulting</p>
+          </a>
+          <a href="https://www.instagram.com/asante_andi_consulting?igsh=MWkxem5pbXA3Z29hMw==" target="_blank" rel="noopener noreferrer" className="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow">
+            <Instagram className="w-8 h-8 text-primary mb-3" />
+            <h3 className="font-display font-bold text-foreground mb-1">Instagram</h3>
+            <p className="text-sm text-muted-foreground">@asante_andi_consulting</p>
+          </a>
+          <a href="https://www.tiktok.com/@asanteandi" target="_blank" rel="noopener noreferrer" className="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow">
+            <svg className="w-8 h-8 text-primary mb-3" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78 2.92 2.92 0 0 1 .88.13v-3.5a6.37 6.37 0 0 0-.88-.07 6.34 6.34 0 0 0 0 12.68 6.34 6.34 0 0 0 6.34-6.34V9.05a8.27 8.27 0 0 0 3.76.92V6.69Z"/></svg>
+            <h3 className="font-display font-bold text-foreground mb-1">TikTok</h3>
+            <p className="text-sm text-muted-foreground">@asanteandi</p>
+          </a>
+          <a href="https://www.linkedin.com/company/asanteandi" target="_blank" rel="noopener noreferrer" className="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow">
+            <Linkedin className="w-8 h-8 text-primary mb-3" />
+            <h3 className="font-display font-bold text-foreground mb-1">LinkedIn</h3>
+            <p className="text-sm text-muted-foreground">Asante Andi Consulting</p>
+          </a>
+          <a href="https://x.com/asanteandi" target="_blank" rel="noopener noreferrer" className="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow">
+            <svg className="w-8 h-8 text-primary mb-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <h3 className="font-display font-bold text-foreground mb-1">X (Twitter)</h3>
+            <p className="text-sm text-muted-foreground">@asanteandi</p>
           </a>
         </div>
 
