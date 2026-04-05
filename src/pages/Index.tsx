@@ -175,6 +175,30 @@ const HomePage = () => (
       </div>
     </section>
 
+    {/* FAQ */}
+    <section className="py-16 md:py-24">
+      <div className="container">
+        <motion.div {...fadeInUp} transition={{ duration: 0.5 }} className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-3">Frequently Asked Questions</h2>
+          <p className="text-muted-foreground max-w-lg mx-auto">Quick answers to the questions we hear most from students and professionals.</p>
+        </motion.div>
+        <motion.div {...fadeInUp} transition={{ duration: 0.5, delay: 0.1 }} className="max-w-3xl mx-auto">
+          <Accordion type="single" collapsible className="w-full">
+            {faqs.map((faq, i) => (
+              <AccordionItem key={i} value={`faq-${i}`} className="border-border">
+                <AccordionTrigger className="text-left font-display font-semibold text-foreground hover:text-primary hover:no-underline">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </motion.div>
+      </div>
+    </section>
+
     {/* Final CTA */}
     <motion.section {...fadeInUp} transition={{ duration: 0.6 }} className="gradient-cta py-16">
       <div className="container text-center">
