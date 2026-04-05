@@ -68,7 +68,7 @@ const Footer = () => (
             <div className="flex flex-col gap-3 text-sm">
               <a href="tel:+27760884005" className="flex items-center gap-2 opacity-70 hover:opacity-100"><Phone className="w-4 h-4" /> 076 088 4005</a>
               <a href="mailto:info@asanteandi.co.za" className="flex items-center gap-2 opacity-70 hover:opacity-100"><Mail className="w-4 h-4" /> info@asanteandi.co.za</a>
-              <span className="flex items-center gap-2 opacity-70"><MapPin className="w-4 h-4" /> Centurion, South Africa</span>
+              <span className="flex items-start gap-2 opacity-70"><MapPin className="w-4 h-4 mt-0.5 shrink-0" /> No. 2151 Moretlwa Street, Tlhabane, Fox Lake, Unit B, Rustenburg 0308, South Africa</span>
             </div>
           </div>
         </div>
