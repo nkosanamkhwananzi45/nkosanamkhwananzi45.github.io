@@ -42,6 +42,16 @@ const BookingPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!user) {
+      toast({
+        title: "Please sign in",
+        description: "You need to be logged in to book a service.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -62,7 +72,7 @@ const BookingPage = () => {
           amount,
           status: 'pending',
           payment_status: amount > 0 ? 'unpaid' : 'quote_requested',
-          user_id: user?.id,
+          user_id: user.id,
         })
         .select()
         .single();
