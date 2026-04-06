@@ -32,7 +32,7 @@ export type Database = {
           service_category: string
           status: string
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           amount?: number | null
@@ -51,7 +51,7 @@ export type Database = {
           service_category: string
           status?: string
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           amount?: number | null
@@ -70,7 +70,7 @@ export type Database = {
           service_category?: string
           status?: string
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
