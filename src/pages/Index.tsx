@@ -28,7 +28,7 @@ const trustFeatures = [
 const faqs = [
   { q: "What services does Asante Andi Consulting offer?", a: "We offer academic support (assignments, tutoring, exam prep), ECD online training, research & writing support (proposals, dissertations, journal articles), workshops & training, and professional consultation — all tailored for South African students and institutions." },
   { q: "How much do your services cost?", a: "All our services start from R600. We offer tiered packages to suit different needs — from single assignments to full-semester support. Visit our Pricing page for detailed breakdowns." },
-  { q: "Which institutions do you support?", a: "We support students from SANTS, UNISA, University of Johannesburg, Wits, UCT, UKZN, Stadio, NWU, and 15+ other South African universities and colleges." },
+  { q: "Which institutions do you support?", a: "We support students from UNISA, University of Johannesburg, Wits, UCT, UKZN, Stadio, NWU, and 15+ other South African universities and colleges." },
   { q: "Is your work plagiarism-free?", a: "Absolutely. All work is developed from original research, properly referenced using approved academic styles, and prepared with Turnitin and other plagiarism detection systems in mind." },
   { q: "Do you use AI tools in your work?", a: "We recognise the growing role of AI in academia. Any use of AI tools is responsible, transparent, and in line with university guidelines — we never encourage misuse or over-reliance." },
   { q: "How do I get started?", a: "Simply click 'Book a Service' to choose your package, or WhatsApp us on 076 088 4005 for a quick consultation. We'll guide you through the process step by step." },
@@ -37,7 +37,7 @@ const faqs = [
 ];
 
 const testimonials = [
-  { name: "Thandi M.", role: "SANTS Student", text: "Asante Andi helped me complete my assignments on time. Their support was amazing and I passed with distinction!" },
+  { name: "Thandi M.", role: "Student", text: "Asante Andi helped me complete my assignments on time. Their support was amazing and I passed with distinction!" },
   { name: "Sipho K.", role: "UNISA Honours", text: "The research guidance I received for my dissertation was invaluable. Professional and thorough." },
   { name: "Nomsa D.", role: "ECD Practitioner", text: "The ECD training sessions are well-structured and practical. I recommend them to every practitioner." },
   { name: "James L.", role: "UJ Postgrad", text: "From proposal to viva prep, they walked with me every step. Truly further together!" },
