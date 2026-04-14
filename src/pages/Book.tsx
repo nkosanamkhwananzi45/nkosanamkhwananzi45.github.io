@@ -161,7 +161,7 @@ const BookingPage = () => {
               </div>
               <div>
                 <label className="block text-sm font-bold text-foreground mb-1">Institution</label>
-                <input name="institution" value={form.institution} onChange={handleChange} placeholder="e.g. SANTS, UNISA, UJ" className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                <input name="institution" value={form.institution} onChange={handleChange} placeholder="e.g. UNISA, UJ" className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
