@@ -192,7 +192,7 @@ export const services: ServiceCategory[] = [
 ];
 
 export const institutions = [
-  "SANTS", "UNISA", "University of Johannesburg", "Wits University",
+  "UNISA", "University of Johannesburg", "Wits University",
   "University of Cape Town", "UKZN", "Stadio", "North-West University",
   "Walter Sisulu University", "University of Mpumalanga", "Tshwane University of Technology",
   "University of Pretoria", "Stellenbosch University", "University of the Free State",
