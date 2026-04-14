@@ -61,7 +61,7 @@ const HomePage = () => (
       <div className="container py-16 md:py-24 relative z-10">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="max-w-2xl">
           <div className="flex flex-wrap gap-2 mb-6">
-            {["Research", "Workshops", "Consultation & Training", "SANTS Specialist"].map(badge => (
+            {["Research", "Workshops", "Consultation & Training", "Assingment Specialist"].map(badge => (
               <span key={badge} className="px-3 py-1 rounded-full text-xs font-bold bg-gold/20 text-gold border border-gold/30">{badge}</span>
             ))}
           </div>
