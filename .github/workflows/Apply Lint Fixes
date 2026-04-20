@@ -1,0 +1,20 @@
+name: Apply Lint Fixes
+on: workflow_dispatch  # manual trigger only
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - name: Upload fix script
+        run: |
+          # paste the full contents of fix-lint.mjs here as a heredoc
+          cat > fix-lint.mjs << 'EOF'
+          # ... (paste the script content) ...
+          EOF
+      - run: node fix-lint.mjs
+      - run: bun run lint
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "fix: resolve all 43 ESLint errors and warnings"
