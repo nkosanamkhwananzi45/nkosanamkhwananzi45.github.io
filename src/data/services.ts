@@ -25,7 +25,7 @@ export const services: ServiceCategory[] = [
     title: "Academic Support",
     shortTitle: "Academic",
     description: "Assignment support, exam preparation, and tutoring for all South African institutions.",
-    highlight: "Assignment Specialist",
+    highlight: "SANTS Specialist",
     icon: "GraduationCap",
     startingPrice: "R600",
     heroTagline: "Assignment Support That Actually Works",
