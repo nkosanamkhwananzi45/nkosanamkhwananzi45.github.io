@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   fix-and-commit:
@@ -843,10 +844,34 @@ jobs:
       - name: Verify lint passes
         run: bun run lint
 
-      - name: Commit and push fixes
+      - name: Commit and push to feature branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b fix/eslint-lint-cleanup
           git add -A
-          git diff --staged --quiet || git commit -m "fix: resolve all ESLint errors and warnings (v1 + v2 patches)"
-          git push
+          git diff --staged --quiet && echo "Nothing to commit" && exit 0
+          git commit -m "fix: resolve all ESLint errors and warnings"
+          git push origin fix/eslint-lint-cleanup
+
+      - name: Open Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "fix: resolve all ESLint errors and warnings" \
+            --body "Automated fix for all ESLint errors and warnings.
+
+          **Changes made:**
+          - Replaced any with typed alternatives (unknown, Record<string, unknown>)
+          - Converted empty interfaces to type aliases
+          - Fixed require() to ESM import in tailwind.config.ts
+          - Wrapped fetch functions in useCallback and updated useEffect dep arrays
+          - Added missing deps (filterStatus, warningThreshold) to useCallback
+          - Fixed ProviderMessaging useMemo parse error
+          - Corrected eslint-disable placement in badge, button, form, sidebar, sonner, toggle
+          - Fixed empty interface in textarea.tsx
+
+          Lint result: 0 errors, 0 warnings" \
+            --base main \
+            --head fix/eslint-lint-cleanup
