@@ -22,7 +22,7 @@ export interface ServiceCategory {
 export const services: ServiceCategory[] = [
   {
     slug: "academic",
-    title: "Academic Support",
+    title: "Assignment Support",
     shortTitle: "Academic",
     description: "Assignment support, exam preparation, and tutoring for all South African institutions.",
     highlight: "ACADEMIC Specialist",
