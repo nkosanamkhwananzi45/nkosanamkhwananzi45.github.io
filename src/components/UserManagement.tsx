@@ -160,7 +160,7 @@ export const UserManagement = () => {
                     <div className="flex flex-wrap gap-1">
                       {user.roles.length === 0 && <span className="text-sm text-muted-foreground">No roles</span>}
                       {user.roles.map(role => (
-                        <Badge key={role} variant={roleBadgeVariant(role) as any} className="gap-1">
+                        <Badge key={role} variant={roleBadgeVariant(role) as unknown} className="gap-1">
                           {role}
                           <button
                             onClick={() => handleRemoveRole(user.id, role)}

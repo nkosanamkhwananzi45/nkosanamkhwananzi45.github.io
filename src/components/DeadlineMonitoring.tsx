@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -37,9 +37,9 @@ export const DeadlineMonitoring = () => {
 
   useEffect(() => {
     fetchDeadlines();
-  }, [warningThreshold]);
+  }, [warningThreshold, fetchDeadlines]);
 
-  const fetchDeadlines = async () => {
+  const fetchDeadlines = useCallback(async () => {
     setLoading(true);
     try {
       const { data: bookings, error } = await supabase
@@ -78,7 +78,7 @@ export const DeadlineMonitoring = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const getStatusIcon = (status: DeadlineItem['deadlineStatus']) => {
     switch (status) {

@@ -70,7 +70,7 @@ export const IntakeManagement = () => {
     }
   };
 
-  const handleFilterChange = (key: keyof IntakeFilter, value: any) => {
+  const handleFilterChange = (key: keyof IntakeFilter, value: Record<string, unknown>) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value || undefined,

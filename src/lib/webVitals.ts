@@ -27,8 +27,8 @@ export function reportWebVitals(onReport: MetricCallback = console.debug.bind(co
     let clsValue = 0;
     const clsObserver = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        if (!(entry as any).hadRecentInput) {
-          clsValue += (entry as any).value;
+        if (!(entry as unknown).hadRecentInput) {
+          clsValue += (entry as unknown).value;
         }
       }
     });
@@ -58,7 +58,7 @@ export function reportWebVitals(onReport: MetricCallback = console.debug.bind(co
     const fidObserver = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0];
       if (entry) {
-        const value = (entry as any).processingStart - entry.startTime;
+        const value = (entry as unknown).processingStart - entry.startTime;
         onReport({ name: "FID", value, rating: getRating("FID", value) });
       }
     });

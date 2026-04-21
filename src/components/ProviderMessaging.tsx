@@ -34,6 +34,7 @@ export const ProviderMessaging = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const convoKey = user?.id ? `${user.id}-${recipientId}` : '';
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const messages = conversations[convoKey] || [];
 
   useEffect(() => {

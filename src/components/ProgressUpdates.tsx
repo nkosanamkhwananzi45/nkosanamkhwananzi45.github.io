@@ -139,7 +139,7 @@ export const ProgressUpdates = ({ assignmentId }: ProgressUpdatesProps) => {
           <div className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="status">Current Status</Label>
-              <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+              <Select value={status} onValueChange={(value: Record<string, unknown>) => setStatus(value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>

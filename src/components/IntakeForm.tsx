@@ -116,7 +116,7 @@ export default function IntakeForm({ initialData, onSuccess }: IntakeFormProps) 
             <Select
               value={formData.service_type}
               onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, service_type: value as any }))
+                setFormData((prev) => ({ ...prev, service_type: value as unknown }))
               }
             >
               <SelectTrigger>
@@ -134,7 +134,7 @@ export default function IntakeForm({ initialData, onSuccess }: IntakeFormProps) 
             <Select
               value={formData.priority}
               onValueChange={(value) =>
-                setFormData((prev) => ({ ...prev, priority: value as any }))
+                setFormData((prev) => ({ ...prev, priority: value as unknown }))
               }
             >
               <SelectTrigger>
