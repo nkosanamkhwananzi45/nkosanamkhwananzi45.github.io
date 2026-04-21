@@ -1,0 +1,64 @@
+name: Claude AI Assistant
+
+on:
+  # Trigger when @claude is mentioned in any PR or Issue comment
+  issue_comment:
+    types: [created]
+
+  # Trigger when @claude is mentioned in a PR review comment
+  pull_request_review_comment:
+    types: [created]
+
+  # Trigger when a PR is opened, updated, or reviewed
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+  # Allow manual trigger with a custom prompt
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "Instruction for Claude (e.g. fix all lint errors, rename SANTS to ASSIGNMENTS)"
+        required: true
+        type: string
+
+permissions:
+  contents: write        # Read and write repo files
+  pull-requests: write   # Open, comment on, and update PRs
+  issues: write          # Comment on and update issues
+  id-token: write        # For signed commits via GitHub API
+
+jobs:
+  claude:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          # For workflow_dispatch: use the manual prompt input
+          # For PR/issue comments: Claude auto-detects @claude mentions
+          prompt: ${{ github.event.inputs.prompt }}
+
+          # Give Claude access to run bun, git, and read/write files
+          allowed_tools: "Bash(bun:*),Bash(git:*),Bash(grep:*),Bash(sed:*),Bash(find:*),View,GlobTool,GrepTool,Edit,Replace,Write"
+
+          # Claude will use signed commits via GitHub API (satisfies your repo's signature rule)
+          use_commit_signing: "true"
+
+          # Max reasoning turns before stopping
+          claude_args: "--max-turns 30"
