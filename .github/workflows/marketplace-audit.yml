@@ -1,0 +1,246 @@
+name: Codebase Audit & Marketplace Recommendations
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run Full Codebase Audit
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          use_commit_signing: "true"
+          allowed_tools: "Bash(find:*),Bash(grep:*),Bash(cat:*),Bash(wc:*),Bash(ls:*),Bash(bun:*),Bash(bunx:*),View,GlobTool,GrepTool"
+          claude_args: "--max-turns 100"
+          prompt: |
+            You are a senior full-stack architect conducting a deep audit of this codebase.
+            The goal is to transform this into a fully functional MARKETPLACE platform.
+
+            This is an academic support marketplace (Asante Andi Consulting) that connects:
+            - SERVICE PROVIDERS (tutors, academic support specialists)
+            - CLIENTS (students needing academic help)
+            - ADMIN (AAC staff managing the platform)
+
+            ═══════════════════════════════════════════════════════
+            PHASE 1 — CODEBASE DISCOVERY
+            ═══════════════════════════════════════════════════════
+
+            Start by mapping the entire codebase:
+
+            1. List all files and folders:
+               find . -type f \( -name "*.tsx" -o -name "*.ts" -o -name "*.sql" -o -name "*.json" \) \
+                 | grep -v node_modules | grep -v dist | grep -v .git | sort
+
+            2. Read every file in src/ and supabase/ fully.
+
+            3. Map out:
+               a) All pages and routes
+               b) All components and what they render
+               c) All Supabase tables, columns, and relationships (from migrations/schema)
+               d) All existing API calls and hooks
+               e) All auth flows
+               f) All existing features that are working
+               g) All features that are stubbed/incomplete/broken
+
+            ═══════════════════════════════════════════════════════
+            PHASE 2 — CURRENT STATE ASSESSMENT
+            ═══════════════════════════════════════════════════════
+
+            For each area below, assess: COMPLETE / PARTIAL / MISSING / BROKEN
+
+            FRONTEND:
+            □ Authentication (login, register, forgot password)
+            □ Role-based routing (admin vs provider vs client views)
+            □ Provider onboarding flow
+            □ Client booking flow
+            □ Service listing / marketplace browse page
+            □ Search and filter functionality
+            □ Provider profile pages
+            □ Messaging / chat system
+            □ Notifications system
+            □ Payment dashboard
+            □ Progress tracking
+            □ Review and rating system
+            □ Admin dashboard
+            □ Intake management
+            □ Deadline monitoring
+            □ Booking allocation
+            □ Mobile responsiveness
+
+            BACKEND (Supabase):
+            □ Database schema completeness
+            □ Row Level Security (RLS) policies
+            □ Auth setup and user roles
+            □ Storage buckets
+            □ Edge functions
+            □ Webhooks
+            □ Payment processing integration
+            □ Email notifications
+            □ Real-time subscriptions
+
+            ═══════════════════════════════════════════════════════
+            PHASE 3 — MARKETPLACE GAP ANALYSIS
+            ═══════════════════════════════════════════════════════
+
+            A marketplace needs these core systems. Identify what is missing:
+
+            1. DISCOVERY ENGINE
+               - Service categories and tags
+               - Search with filters (subject, price, availability, rating)
+               - Provider ranking algorithm
+               - Featured/promoted listings
+
+            2. BOOKING & SCHEDULING
+               - Provider availability calendar
+               - Session booking with time slots
+               - Booking confirmation flow
+               - Cancellation and rescheduling
+               - Automated reminders
+
+            3. TRUST & SAFETY
+               - Provider verification workflow
+               - Document upload (qualifications, ID)
+               - Client verification
+               - Review and rating system
+               - Dispute resolution flow
+               - Report system
+
+            4. PAYMENTS
+               - Client payment flow (card/EFT/PayFast for SA)
+               - Escrow / hold until session complete
+               - Provider payout system
+               - Refund handling
+               - Invoice generation
+               - VAT handling (South African 15% VAT)
+               - Commission/fee deduction for AAC
+
+            5. COMMUNICATION
+               - In-app messaging (provider ↔ client)
+               - File sharing in chat
+               - Email notifications (booking, reminders, payment)
+               - SMS notifications (South African numbers)
+               - Video session link sharing (Zoom/Teams/Meet)
+
+            6. PROVIDER MANAGEMENT
+               - Provider application and onboarding
+               - Profile with bio, qualifications, subjects
+               - Availability management
+               - Earnings dashboard
+               - Tax certificate / IRP5 generation
+               - Performance metrics
+
+            7. CLIENT MANAGEMENT
+               - Client profile and academic history
+               - Saved/favourite providers
+               - Session history
+               - Progress reports
+               - Document uploads (assignments, past papers)
+
+            8. ADMIN CONTROLS
+               - User management (approve/suspend providers)
+               - Booking oversight
+               - Financial reporting
+               - Content moderation
+               - Platform analytics dashboard
+               - Commission settings
+
+            ═══════════════════════════════════════════════════════
+            PHASE 4 — FULL RECOMMENDATIONS REPORT
+            ═══════════════════════════════════════════════════════
+
+            Produce a detailed markdown report structured as follows:
+
+            # AAC Marketplace — Full Codebase Audit Report
+
+            ## Executive Summary
+            (3-4 sentences: current state, biggest gaps, estimated completion effort)
+
+            ## Current Feature Status
+            (Table: Feature | Status | Notes)
+
+            ## Critical Issues (Fix First)
+            (Numbered list — things that will break the platform if not fixed)
+
+            ## Missing Backend — Supabase Schema
+            For each missing table, provide the exact SQL:
+            ```sql
+            CREATE TABLE table_name (
+              ...
+            );
+            ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
+            CREATE POLICY ...
+            ```
+
+            ## Missing Frontend Components
+            For each gap, list:
+            - Component name
+            - File path where it should live
+            - What it should do
+            - Which existing components it connects to
+
+            ## Missing API Hooks
+            For each missing hook, provide full TypeScript implementation:
+            ```typescript
+            // src/hooks/useHookName.ts
+            export function useHookName() {
+              ...
+            }
+            ```
+
+            ## Payment Integration Recommendation
+            (Specific recommendation for South African market — PayFast, Peach Payments, or Ozow)
+            (Include integration architecture for escrow model)
+
+            ## South African Compliance Checklist
+            □ POPIA compliance (data privacy)
+            □ VAT registration and invoicing (15%)
+            □ BBBEE considerations
+            □ Consumer Protection Act
+            □ National Credit Act (if credit offered)
+            □ Labour law (provider as contractor vs employee)
+
+            ## Implementation Roadmap
+            Phase 1 (Week 1-2): Critical fixes
+            Phase 2 (Week 3-4): Core marketplace features
+            Phase 3 (Week 5-6): Payments and trust
+            Phase 4 (Week 7-8): Polish and launch
+
+            ## File-by-File Improvement List
+            For every file in src/, list specific improvements needed.
+
+            ═══════════════════════════════════════════════════════
+            PHASE 5 — OUTPUT
+            ═══════════════════════════════════════════════════════
+
+            1. Write the full report to: MARKETPLACE_AUDIT.md in the repo root
+            2. Create a GitHub Issue titled "Marketplace Audit — Action Items" with
+               a summary and checklist of all action items using the GitHub CLI:
+               gh issue create \
+                 --title "Marketplace Audit — Action Items" \
+                 --body "$(cat MARKETPLACE_AUDIT.md)" \
+                 --label "enhancement"
+
+            Begin Phase 1 now. Be exhaustive — read every single file before writing the report.
