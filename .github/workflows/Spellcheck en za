@@ -1,0 +1,112 @@
+name: Spellcheck & Fix (South African English)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**/*.ts'
+      - 'src/**/*.tsx'
+      - 'src/**/*.md'
+      - 'public/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  spellcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Install cspell
+        run: bun add -g cspell
+
+      - name: Run Claude Spellcheck & Fix
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          use_commit_signing: "true"
+          allowed_tools: "Bash(find:*),Bash(grep:*),Bash(sed:*),Bash(cat:*),Bash(bun:*),View,GlobTool,GrepTool,Edit,Replace,Write"
+          claude_args: "--max-turns 80"
+          prompt: |
+            You are a South African English (en-ZA) spellchecker and editor.
+            South African English follows BRITISH spelling conventions, not American.
+
+            KEY BRITISH vs AMERICAN SPELLING RULES TO ENFORCE:
+            - colour, flavour, honour, labour, neighbour  (NOT color, flavor, honor, labor, neighbor)
+            - centre, theatre, fibre, metre, litre         (NOT center, theater, fiber, meter, liter)
+            - organise, recognise, realise, analyse        (NOT organize, recognize, realize, analyze)
+            - organisation, realisation, authorisation     (NOT organization, realization, authorization)
+            - defence, offence, licence (noun)             (NOT defense, offense, license as noun)
+            - travelled, cancelled, modelling              (NOT traveled, canceled, modeling)
+            - practise (verb), practice (noun)             (NOT practice for both)
+            - programme                                    (NOT program — except in computing contexts)
+            - enrol, fulfil, skilful                       (NOT enroll, fulfill, skillful)
+            - tyre                                         (NOT tire — for vehicle tyres)
+            - grey                                         (NOT gray)
+            - cheque                                       (NOT check — for banking)
+            - whilst, amongst                              (acceptable alongside while, among)
+
+            YOUR TASK:
+            1. Scan ALL files in src/ and public/ directories
+            2. Fix spelling errors and American English to South African/British English
+            3. Target ONLY these locations — do NOT change anything else:
+               a) UI text in JSX/TSX: string literals inside JSX elements, button text,
+                  labels, headings, placeholders, toast messages, error messages
+               b) Comments (// and /* */ and JSDoc)
+               c) Console.log/error/warn message strings
+               d) .md and .html files — all prose text
+               e) aria-label, title, alt, placeholder attribute values
+               f) Object property VALUES that are display strings (not keys)
+
+            4. DO NOT change:
+               - Variable names, function names, class names
+               - Import paths and module names
+               - TypeScript types and interfaces
+               - Object property KEYS
+               - CSS class names and Tailwind classes
+               - File names or folder names
+               - API endpoint strings and URLs
+               - Database column names and Supabase table/column references
+               - Environment variable names
+               - Package names in package.json
+               - Any code logic or syntax
+               - Route paths (e.g. "/booking-allocation")
+               - IDs and technical identifiers
+
+            PROCESS:
+            Step 1: Run this command to list all source files:
+              find src public -type f \( -name "*.tsx" -o -name "*.ts" -o -name "*.md" -o -name "*.html" \) | grep -v node_modules | sort
+
+            Step 2: For each file, read its contents carefully.
+
+            Step 3: Identify ALL spelling errors and American English spellings in
+            the allowed locations listed above.
+
+            Step 4: Fix each file. For every change document it like:
+              FILE: src/components/Example.tsx
+              LINE 42: "color" → "colour" (in JSX label text)
+              LINE 87: "organize" → "organise" (in comment)
+
+            Step 5: After fixing all files, produce a SUMMARY listing:
+              - Total files scanned
+              - Total files changed
+              - Total corrections made
+              - Full list of every change made (file, line, before → after)
+
+            Begin now. Be thorough — check every single file.
