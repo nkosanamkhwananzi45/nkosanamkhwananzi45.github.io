@@ -121,7 +121,7 @@ const BookingPage = () => {
           });
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Something went wrong",
         description: error.message || "Please try again or WhatsApp us directly.",

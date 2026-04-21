@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -45,9 +45,9 @@ export const BookingAllocation = () => {
 
   useEffect(() => {
     fetchBookings();
-  }, [filterStatus]);
+  }, [filterStatus, fetchBookings]);
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
       let query = supabase
@@ -66,7 +66,7 @@ export const BookingAllocation = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {

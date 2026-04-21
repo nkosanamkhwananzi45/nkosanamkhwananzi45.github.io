@@ -10,7 +10,7 @@ export const useProgressUpdates = () => {
   const fetchProgressUpdates = useCallback(async (assignmentId: string) => {
     setLoading(true);
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await (supabase as unknown)
         .from('progress_updates')
         .select('*')
         .eq('assignment_id', assignmentId)
@@ -38,7 +38,7 @@ export const useProgressUpdates = () => {
     ) => {
       setLoading(true);
       try {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await (supabase as unknown)
           .from('progress_updates')
           .insert([
             {
@@ -59,7 +59,7 @@ export const useProgressUpdates = () => {
         setUpdates(prev => [data, ...prev]);
 
         // Update assignment status
-        await (supabase as any)
+        await (supabase as unknown)
           .from('assignments')
           .update({
             status,
@@ -68,7 +68,7 @@ export const useProgressUpdates = () => {
           .eq('id', assignmentId);
 
         // Notify client
-        await (supabase as any).from('notifications').insert({
+        await (supabase as unknown).from('notifications').insert({
           type: 'assignment',
           title: 'Progress Update',
           message: `Your assignment has a new progress update: ${notes}`,

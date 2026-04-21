@@ -10,7 +10,7 @@ export const useProviderMessaging = () => {
   const fetchConversation = useCallback(async (providerId: string, recipientId: string, assignmentId?: string) => {
     setLoading(true);
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await (supabase as unknown)
         .from('messages')
         .select('*')
         .or(
@@ -27,7 +27,7 @@ export const useProviderMessaging = () => {
       }));
 
       // Mark as read
-      await (supabase as any)
+      await (supabase as unknown)
         .from('messages')
         .update({ is_read: true })
         .eq('recipient_id', providerId)
@@ -52,7 +52,7 @@ export const useProviderMessaging = () => {
       attachments?: string[]
     ) => {
       try {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await (supabase as unknown)
           .from('messages')
           .insert([
             {

@@ -27,7 +27,7 @@ export const ProviderPaymentDashboard = () => {
   const { payments, loading, fetchPayments, downloadPaymentStatement, getPaymentSummary } =
     useProviderPayments();
 
-  const [summary, setSummary] = useState<any>(null);
+  const [summary, setSummary] = useState<unknown>(null);
   const [startDate, setStartDate] = useState(
     new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0]
   );
