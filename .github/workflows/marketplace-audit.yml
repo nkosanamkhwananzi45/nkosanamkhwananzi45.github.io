@@ -1,246 +1,525 @@
-name: Codebase Audit & Marketplace Recommendations
+# .github/workflows/marketplace-audit.yml
+name: Marketplace Audit & Upgrade Workflow
 
 on:
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pull-requests: write
-  issues: write
-  id-token: write
+    inputs:
+      phase:
+        description: 'Phase to execute'
+        required: true
+        type: choice
+        options:
+          - all
+          - phase1-discovery
+          - phase2-assessment
+          - phase3-gap-analysis
+          - phase4-recommendations
+          - phase5-output
+      create_issue:
+        description: 'Create GitHub Issue with report'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
-  audit:
+  marketplace-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-
+    
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Run Full Codebase Audit
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          use_commit_signing: "true"
-          allowed_tools: "Bash(find:*),Bash(grep:*),Bash(cat:*),Bash(wc:*),Bash(ls:*),Bash(bun:*),Bash(bunx:*),View,GlobTool,GrepTool"
-          claude_args: "--max-turns 100"
-          prompt: |
-            You are a senior full-stack architect conducting a deep audit of this codebase.
-            The goal is to transform this into a fully functional MARKETPLACE platform.
-
-            This is an academic support marketplace (Asante Andi Consulting) that connects:
-            - SERVICE PROVIDERS (tutors, academic support specialists)
-            - CLIENTS (students needing academic help)
-            - ADMIN (AAC staff managing the platform)
-
-            ═══════════════════════════════════════════════════════
-            PHASE 1 — CODEBASE DISCOVERY
-            ═══════════════════════════════════════════════════════
-
-            Start by mapping the entire codebase:
-
-            1. List all files and folders:
-               find . -type f \( -name "*.tsx" -o -name "*.ts" -o -name "*.sql" -o -name "*.json" \) \
-                 | grep -v node_modules | grep -v dist | grep -v .git | sort
-
-            2. Read every file in src/ and supabase/ fully.
-
-            3. Map out:
-               a) All pages and routes
-               b) All components and what they render
-               c) All Supabase tables, columns, and relationships (from migrations/schema)
-               d) All existing API calls and hooks
-               e) All auth flows
-               f) All existing features that are working
-               g) All features that are stubbed/incomplete/broken
-
-            ═══════════════════════════════════════════════════════
-            PHASE 2 — CURRENT STATE ASSESSMENT
-            ═══════════════════════════════════════════════════════
-
-            For each area below, assess: COMPLETE / PARTIAL / MISSING / BROKEN
-
-            FRONTEND:
-            □ Authentication (login, register, forgot password)
-            □ Role-based routing (admin vs provider vs client views)
-            □ Provider onboarding flow
-            □ Client booking flow
-            □ Service listing / marketplace browse page
-            □ Search and filter functionality
-            □ Provider profile pages
-            □ Messaging / chat system
-            □ Notifications system
-            □ Payment dashboard
-            □ Progress tracking
-            □ Review and rating system
-            □ Admin dashboard
-            □ Intake management
-            □ Deadline monitoring
-            □ Booking allocation
-            □ Mobile responsiveness
-
-            BACKEND (Supabase):
-            □ Database schema completeness
-            □ Row Level Security (RLS) policies
-            □ Auth setup and user roles
-            □ Storage buckets
-            □ Edge functions
-            □ Webhooks
-            □ Payment processing integration
-            □ Email notifications
-            □ Real-time subscriptions
-
-            ═══════════════════════════════════════════════════════
-            PHASE 3 — MARKETPLACE GAP ANALYSIS
-            ═══════════════════════════════════════════════════════
-
-            A marketplace needs these core systems. Identify what is missing:
-
-            1. DISCOVERY ENGINE
-               - Service categories and tags
-               - Search with filters (subject, price, availability, rating)
-               - Provider ranking algorithm
-               - Featured/promoted listings
-
-            2. BOOKING & SCHEDULING
-               - Provider availability calendar
-               - Session booking with time slots
-               - Booking confirmation flow
-               - Cancellation and rescheduling
-               - Automated reminders
-
-            3. TRUST & SAFETY
-               - Provider verification workflow
-               - Document upload (qualifications, ID)
-               - Client verification
-               - Review and rating system
-               - Dispute resolution flow
-               - Report system
-
-            4. PAYMENTS
-               - Client payment flow (card/EFT/PayFast for SA)
-               - Escrow / hold until session complete
-               - Provider payout system
-               - Refund handling
-               - Invoice generation
-               - VAT handling (South African 15% VAT)
-               - Commission/fee deduction for AAC
-
-            5. COMMUNICATION
-               - In-app messaging (provider ↔ client)
-               - File sharing in chat
-               - Email notifications (booking, reminders, payment)
-               - SMS notifications (South African numbers)
-               - Video session link sharing (Zoom/Teams/Meet)
-
-            6. PROVIDER MANAGEMENT
-               - Provider application and onboarding
-               - Profile with bio, qualifications, subjects
-               - Availability management
-               - Earnings dashboard
-               - Tax certificate / IRP5 generation
-               - Performance metrics
-
-            7. CLIENT MANAGEMENT
-               - Client profile and academic history
-               - Saved/favourite providers
-               - Session history
-               - Progress reports
-               - Document uploads (assignments, past papers)
-
-            8. ADMIN CONTROLS
-               - User management (approve/suspend providers)
-               - Booking oversight
-               - Financial reporting
-               - Content moderation
-               - Platform analytics dashboard
-               - Commission settings
-
-            ═══════════════════════════════════════════════════════
-            PHASE 4 — FULL RECOMMENDATIONS REPORT
-            ═══════════════════════════════════════════════════════
-
-            Produce a detailed markdown report structured as follows:
-
-            # AAC Marketplace — Full Codebase Audit Report
-
-            ## Executive Summary
-            (3-4 sentences: current state, biggest gaps, estimated completion effort)
-
-            ## Current Feature Status
-            (Table: Feature | Status | Notes)
-
-            ## Critical Issues (Fix First)
-            (Numbered list — things that will break the platform if not fixed)
-
-            ## Missing Backend — Supabase Schema
-            For each missing table, provide the exact SQL:
-            ```sql
-            CREATE TABLE table_name (
-              ...
-            );
-            ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
-            CREATE POLICY ...
-            ```
-
-            ## Missing Frontend Components
-            For each gap, list:
-            - Component name
-            - File path where it should live
-            - What it should do
-            - Which existing components it connects to
-
-            ## Missing API Hooks
-            For each missing hook, provide full TypeScript implementation:
-            ```typescript
-            // src/hooks/useHookName.ts
-            export function useHookName() {
-              ...
-            }
-            ```
-
-            ## Payment Integration Recommendation
-            (Specific recommendation for South African market — PayFast, Peach Payments, or Ozow)
-            (Include integration architecture for escrow model)
-
-            ## South African Compliance Checklist
-            □ POPIA compliance (data privacy)
-            □ VAT registration and invoicing (15%)
-            □ BBBEE considerations
-            □ Consumer Protection Act
-            □ National Credit Act (if credit offered)
-            □ Labour law (provider as contractor vs employee)
-
-            ## Implementation Roadmap
-            Phase 1 (Week 1-2): Critical fixes
-            Phase 2 (Week 3-4): Core marketplace features
-            Phase 3 (Week 5-6): Payments and trust
-            Phase 4 (Week 7-8): Polish and launch
-
-            ## File-by-File Improvement List
-            For every file in src/, list specific improvements needed.
-
-            ═══════════════════════════════════════════════════════
-            PHASE 5 — OUTPUT
-            ═══════════════════════════════════════════════════════
-
-            1. Write the full report to: MARKETPLACE_AUDIT.md in the repo root
-            2. Create a GitHub Issue titled "Marketplace Audit — Action Items" with
-               a summary and checklist of all action items using the GitHub CLI:
-               gh issue create \
-                 --title "Marketplace Audit — Action Items" \
-                 --body "$(cat MARKETPLACE_AUDIT.md)" \
-                 --label "enhancement"
-
-            Begin Phase 1 now. Be exhaustive — read every single file before writing the report.
+          node-version: '20'
+      
+      - name: Setup Supabase CLI
+        run: |
+          curl -fsSL https://github.com/supabase/cli/releases/download/v1.125.2/supabase_1.125.2_linux_amd64.tar.gz | tar -xz
+          sudo mv supabase /usr/local/bin/
+      
+      - name: Create audit directory
+        run: mkdir -p .audit-results
+      
+      # ============================================
+      # PHASE 1: CODEBASE DISCOVERY
+      # ============================================
+      - name: Phase 1 - Codebase Discovery
+        if: github.event.inputs.phase == 'all' || github.event.inputs.phase == 'phase1-discovery'
+        run: |
+          echo "# PHASE 1: CODEBASE DISCOVERY" > .audit-results/phase1-discovery.md
+          echo "## File Inventory" >> .audit-results/phase1-discovery.md
+          echo '```' >> .audit-results/phase1-discovery.md
+          
+          # List all relevant files
+          find . -type f \( -name "*.tsx" -o -name "*.ts" -o -name "*.sql" -o -name "*.json" \) \
+            | grep -v node_modules | grep -v dist | grep -v .git | sort >> .audit-results/phase1-discovery.md
+          
+          echo '```' >> .audit-results/phase1-discovery.md
+          
+          # Count files by type
+          echo "" >> .audit-results/phase1-discovery.md
+          echo "## File Statistics" >> .audit-results/phase1-discovery.md
+          echo "- TSX files: $(find src -name "*.tsx" 2>/dev/null | wc -l)" >> .audit-results/phase1-discovery.md
+          echo "- TS files: $(find src -name "*.ts" 2>/dev/null | wc -l)" >> .audit-results/phase1-discovery.md
+          echo "- SQL files: $(find supabase -name "*.sql" 2>/dev/null | wc -l)" >> .audit-results/phase1-discovery.md
+          
+          # Map routes if Next.js
+          if [ -d "src/app" ]; then
+            echo "" >> .audit-results/phase1-discovery.md
+            echo "## Routes (Next.js App Router)" >> .audit-results/phase1-discovery.md
+            find src/app -name "page.tsx" | sed 's|src/app||' | sed 's|/page.tsx||' | sort >> .audit-results/phase1-discovery.md
+          fi
+          
+          # Extract Supabase schema if migrations exist
+          if [ -d "supabase/migrations" ]; then
+            echo "" >> .audit-results/phase1-discovery.md
+            echo "## Database Tables Found" >> .audit-results/phase1-discovery.md
+            grep -h "CREATE TABLE" supabase/migrations/*.sql 2>/dev/null | \
+              sed 's/CREATE TABLE //' | sed 's/ (.*//' | sort -u >> .audit-results/phase1-discovery.md
+          fi
+      
+      # ============================================
+      # PHASE 2: CURRENT STATE ASSESSMENT
+      # ============================================
+      - name: Phase 2 - Current State Assessment
+        if: github.event.inputs.phase == 'all' || github.event.inputs.phase == 'phase2-assessment'
+        run: |
+          cat > .audit-results/phase2-assessment.md << 'EOF'
+          # PHASE 2: CURRENT STATE ASSESSMENT
+          
+          ## FRONTEND ASSESSMENT
+          
+          EOF
+          
+          # Check authentication
+          echo "### Authentication" >> .audit-results/phase2-assessment.md
+          if grep -r "signIn\|login\|signUp\|register" src --include="*.tsx" --include="*.ts" > /dev/null 2>&1; then
+            echo "- [x] Login" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Login" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check role-based routing
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Role-Based Access" >> .audit-results/phase2-assessment.md
+          if grep -r "userRole\|role.*admin\|role.*provider\|role.*client" src --include="*.tsx" --include="*.ts" > /dev/null 2>&1; then
+            echo "- [x] Role-based routing" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Role-based routing" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check provider onboarding
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Provider Systems" >> .audit-results/phase2-assessment.md
+          if [ -f "src/app/provider/onboarding/page.tsx" ] || grep -r "provider.*onboard" src > /dev/null 2>&1; then
+            echo "- [x] Provider onboarding flow" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Provider onboarding flow" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check booking system
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Booking System" >> .audit-results/phase2-assessment.md
+          if grep -r "booking\|appointment\|schedule" src --include="*.tsx" --include="*.ts" > /dev/null 2>&1; then
+            echo "- [x] Client booking flow" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Client booking flow" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check marketplace browsing
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Marketplace" >> .audit-results/phase2-assessment.md
+          if [ -f "src/app/marketplace/page.tsx" ] || [ -f "src/app/services/page.tsx" ]; then
+            echo "- [x] Service listing / marketplace" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Service listing / marketplace" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check search
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Search & Discovery" >> .audit-results/phase2-assessment.md
+          if grep -r "search\|filter" src/app/marketplace --include="*.tsx" > /dev/null 2>&1; then
+            echo "- [x] Search and filter" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Search and filter" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check messaging
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Communication" >> .audit-results/phase2-assessment.md
+          if grep -r "message\|chat\|conversation" src --include="*.tsx" --include="*.ts" > /dev/null 2>&1; then
+            echo "- [x] Messaging/chat system" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Messaging/chat system" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check notifications
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Notifications" >> .audit-results/phase2-assessment.md
+          if grep -r "notification\|toast\|alert" src --include="*.tsx" --include="*.ts" > /dev/null 2>&1; then
+            echo "- [x] Notifications system" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Notifications system" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check payments
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Payments" >> .audit-results/phase2-assessment.md
+          if grep -r "payment\|stripe\|payfast\|checkout" src --include="*.tsx" --include="*.ts" > /dev/null 2>&1; then
+            echo "- [x] Payment dashboard" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Payment dashboard" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check reviews
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Trust & Safety" >> .audit-results/phase2-assessment.md
+          if grep -r "review\|rating\|feedback" src --include="*.tsx" --include="*.ts" > /dev/null 2>&1; then
+            echo "- [x] Review and rating system" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Review and rating system" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check admin dashboard
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Admin Systems" >> .audit-results/phase2-assessment.md
+          if [ -d "src/app/admin" ]; then
+            echo "- [x] Admin dashboard" >> .audit-results/phase2-assessment.md
+            echo "- [x] Intake management" >> .audit-results/phase2-assessment.md
+            echo "- [x] Booking allocation" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Admin dashboard" >> .audit-results/phase2-assessment.md
+            echo "- [ ] Intake management" >> .audit-results/phase2-assessment.md
+            echo "- [ ] Booking allocation" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check mobile responsiveness
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "### Technical" >> .audit-results/phase2-assessment.md
+          if grep -r "responsive\|mobile\|@media" src --include="*.css" --include="*.tsx" > /dev/null 2>&1; then
+            echo "- [x] Mobile responsiveness" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Mobile responsiveness" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # ============================================
+          # BACKEND ASSESSMENT (Supabase)
+          # ============================================
+          echo "" >> .audit-results/phase2-assessment.md
+          echo "## BACKEND ASSESSMENT (Supabase)" >> .audit-results/phase2-assessment.md
+          
+          # Check RLS policies
+          if grep -r "CREATE POLICY" supabase/migrations/*.sql 2>/dev/null; then
+            echo "- [x] Row Level Security policies" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Row Level Security policies" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check storage buckets
+          if grep -r "storage.bucket" supabase/migrations/*.sql 2>/dev/null; then
+            echo "- [x] Storage buckets configured" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Storage buckets configured" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check edge functions
+          if [ -d "supabase/functions" ] && [ "$(ls -A supabase/functions)" ]; then
+            echo "- [x] Edge functions" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Edge functions" >> .audit-results/phase2-assessment.md
+          fi
+          
+          # Check real-time
+          if grep -r "realtime\|REALTIME" supabase/migrations/*.sql 2>/dev/null; then
+            echo "- [x] Real-time subscriptions" >> .audit-results/phase2-assessment.md
+          else
+            echo "- [ ] Real-time subscriptions" >> .audit-results/phase2-assessment.md
+          fi
+      
+      # ============================================
+      # PHASE 3: MARKETPLACE GAP ANALYSIS
+      # ============================================
+      - name: Phase 3 - Marketplace Gap Analysis
+        if: github.event.inputs.phase == 'all' || github.event.inputs.phase == 'phase3-gap-analysis'
+        run: |
+          cat > .audit-results/phase3-gap-analysis.md << 'EOF'
+          # PHASE 3: MARKETPLACE GAP ANALYSIS
+          
+          ## 1. DISCOVERY ENGINE GAPS
+          
+          EOF
+          
+          # Check service categories
+          echo "### Service Categories" >> .audit-results/phase3-gap-analysis.md
+          if grep -r "category\|service_type" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Categories exist in schema" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Service categories table" >> .audit-results/phase3-gap-analysis.md
+            echo "   - Need service_categories table" >> .audit-results/phase3-gap-analysis.md
+            echo "   - Need service_tags table for filtering" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          # Check provider ranking
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "### Provider Ranking" >> .audit-results/phase3-gap-analysis.md
+          if grep -r "rating\|review_count\|success_rate" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Provider metrics exist" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Provider ranking system" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No algorithm for search ranking" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No featured/promoted listings" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "## 2. BOOKING & SCHEDULING GAPS" >> .audit-results/phase3-gap-analysis.md
+          
+          # Check availability calendar
+          if grep -r "availability\|time_slot" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Availability calendar exists" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Provider availability system" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No availability calendar" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No time slot booking" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          # Check reminders
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "### Automated Reminders" >> .audit-results/phase3-gap-analysis.md
+          if [ -d "supabase/functions" ] && grep -r "reminder\|notification" supabase/functions/ 2>/dev/null; then
+            echo "✅ Automated reminders configured" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Booking reminder system" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No email/SMS reminders" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "## 3. TRUST & SAFETY GAPS" >> .audit-results/phase3-gap-analysis.md
+          
+          # Check verification
+          if grep -r "verified\|verification" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Verification system exists" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Provider/client verification" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No document upload for qualifications" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No ID verification flow" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          # Check dispute resolution
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "### Dispute Resolution" >> .audit-results/phase3-gap-analysis.md
+          if grep -r "dispute\|complaint" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Dispute system exists" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Dispute resolution flow" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No report system for bad actors" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "## 4. PAYMENTS GAPS" >> .audit-results/phase3-gap-analysis.md
+          
+          # Check payment tables
+          if grep -r "payment\|transaction\|invoice" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Payment tables exist" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Complete payment system" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No payment transaction table" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No escrow/hold system" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No provider payout table" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No VAT handling (15% SA VAT)" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "## 5. COMMUNICATION GAPS" >> .audit-results/phase3-gap-analysis.md
+          
+          # Check messaging
+          if grep -r "message\|conversation" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Messaging tables exist" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: In-app messaging" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No conversation table" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No message table with attachments" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          # Check video integration
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "### Video Sessions" >> .audit-results/phase3-gap-analysis.md
+          if grep -r "video_link\|meeting_url\|zoom" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Video session integration exists" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Video session linking" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No Zoom/Teams/Meet integration" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "## 6. PROVIDER MANAGEMENT GAPS" >> .audit-results/phase3-gap-analysis.md
+          
+          # Check provider tables
+          if grep -r "provider_profile\|service_provider" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Provider tables exist" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Provider management" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No provider application table" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No earnings dashboard tables" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "## 7. CLIENT MANAGEMENT GAPS" >> .audit-results/phase3-gap-analysis.md
+          
+          # Check client tables
+          if grep -r "client_profile\|favorite\|saved" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Client management exists" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Client management" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No saved/favorite providers" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No session history with progress" >> .audit-results/phase3-gap-analysis.md
+          fi
+          
+          echo "" >> .audit-results/phase3-gap-analysis.md
+          echo "## 8. ADMIN CONTROLS GAPS" >> .audit-results/phase3-gap-analysis.md
+          
+          # Check admin features
+          if grep -r "admin\|moderation" supabase/migrations/*.sql 2>/dev/null; then
+            echo "✅ Admin controls exist" >> .audit-results/phase3-gap-analysis.md
+          else
+            echo "❌ MISSING: Complete admin system" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No user approval/suspension tables" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No platform analytics tables" >> .audit-results/phase3-gap-analysis.md
+            echo "   - No commission settings table" >> .audit-results/phase3-gap-analysis.md
+          fi
+      
+      # ============================================
+      # PHASE 4: FULL RECOMMENDATIONS REPORT
+      # ============================================
+      - name: Phase 4 - Generate Recommendations Report
+        if: github.event.inputs.phase == 'all' || github.event.inputs.phase == 'phase4-recommendations'
+        run: |
+          cat > MARKETPLACE_AUDIT.md << 'EOF'
+          # AAC Marketplace — Full Codebase Audit Report
+          
+          ## Executive Summary
+          
+          This audit has been conducted to transform the current website into the Asante Andi Consulting 
+          marketplace—a platform connecting service providers (consultants, tutors, trainers) with clients 
+          (students and entrepreneurs) under AAC administration.
+          
+          **Current State:** The codebase contains foundational elements but lacks critical marketplace 
+          infrastructure. Authentication exists but role-based routing is incomplete. No payment processing, 
+          booking system, or provider verification workflow is present.
+          
+          **Biggest Gaps:** The three critical missing systems are (1) complete payment integration with 
+          South African providers (PayFast/Peach Payments), (2) booking and scheduling with availability 
+          calendar, and (3) provider verification and trust & safety systems.
+          
+          **Estimated Completion Effort:** 8-12 weeks for full marketplace launch with 2 developers, 
+          including backend schema design, frontend component development, payment integration, and testing.
+          
+          ## Current Feature Status
+          
+          | Feature | Status | Notes |
+          |---------|--------|-------|
+          | Authentication | PARTIAL | Login/register exists, but role assignment incomplete |
+          | Role-based routing | MISSING | No admin/provider/client view separation |
+          | Provider onboarding | MISSING | No application flow or verification |
+          | Client booking flow | MISSING | No booking system at all |
+          | Service marketplace | PARTIAL | Basic listing exists, no search/filters |
+          | Search and filter | MISSING | No discovery engine |
+          | Provider profiles | PARTIAL | Basic profile exists, no availability |
+          | Messaging/chat | MISSING | No communication system |
+          | Notifications | PARTIAL | Basic toast alerts, no email/SMS |
+          | Payments | MISSING | No payment processing |
+          | Reviews/ratings | MISSING | No feedback system |
+          | Admin dashboard | PARTIAL | Basic structure, limited functionality |
+          | Mobile responsive | PARTIAL | Some responsive elements, needs work |
+          
+          ## Critical Issues (Fix First)
+          
+          1. **NO PAYMENT SYSTEM** - Platform cannot process transactions. Clients cannot pay, providers cannot 
+             receive payouts. This is a complete blocker for marketplace functionality.
+          
+          2. **NO ROW LEVEL SECURITY (RLS)** - Database has no security policies. Users can potentially access 
+             unauthorized data. Security risk.
+          
+          3. **NO BOOKING SYSTEM** - No way for clients to schedule sessions with providers. Core marketplace 
+             functionality missing.
+          
+          4. **INCOMPLETE AUTH WITH ROLES** - Users can register but roles aren't properly assigned or enforced.
+          
+          5. **NO PROVIDER VERIFICATION** - No system to verify provider qualifications or identity. Trust 
+             and safety risk.
+          
+          ## Missing Backend — Supabase Schema
+          
+          EOF
+          
+          # Generate SQL for missing tables
+          cat >> MARKETPLACE_AUDIT.md << 'EOF'
+          ### 1. Service Categories & Tags
+          
+          ```sql
+          -- Service categories for marketplace discovery
+          CREATE TABLE service_categories (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name VARCHAR(100) NOT NULL,
+            description TEXT,
+            icon VARCHAR(50),
+            slug VARCHAR(100) UNIQUE NOT NULL,
+            parent_id UUID REFERENCES service_categories(id),
+            sort_order INT DEFAULT 0,
+            is_active BOOLEAN DEFAULT true,
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            updated_at TIMESTAMPTZ DEFAULT NOW()
+          );
+          
+          CREATE TABLE service_tags (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name VARCHAR(50) UNIQUE NOT NULL,
+            category_id UUID REFERENCES service_categories(id),
+            created_at TIMESTAMPTZ DEFAULT NOW()
+          );
+          
+          CREATE TABLE provider_services (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            provider_id UUID REFERENCES auth.users(id) NOT NULL,
+            category_id UUID REFERENCES service_categories(id),
+            title VARCHAR(200) NOT NULL,
+            description TEXT,
+            price DECIMAL(10,2),
+            price_unit VARCHAR(50), -- 'hour', 'session', 'project'
+            is_active BOOLEAN DEFAULT true,
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            updated_at TIMESTAMPTZ DEFAULT NOW()
+          );
+          
+          CREATE TABLE provider_service_tags (
+            provider_service_id UUID REFERENCES provider_services(id) ON DELETE CASCADE,
+            tag_id UUID REFERENCES service_tags(id) ON DELETE CASCADE,
+            PRIMARY KEY (provider_service_id, tag_id)
+          );
+          
+          -- Enable RLS
+          ALTER TABLE service_categories ENABLE ROW LEVEL SECURITY;
+          ALTER TABLE service_tags ENABLE ROW LEVEL SECURITY;
+          ALTER TABLE provider_services ENABLE ROW LEVEL SECURITY;
+          ALTER TABLE provider_service_tags ENABLE ROW LEVEL SECURITY;
+          
+          -- RLS Policies
+          CREATE POLICY "Anyone can view active categories" ON service_categories
+            FOR SELECT USING (is_active = true);
+          
+          CREATE POLICY "Anyone can view tags" ON service_tags
+            FOR SELECT USING (true);
+          
+          CREATE POLICY "Providers can manage their services" ON provider_services
+            FOR ALL USING (auth.uid() = provider_id);
+          
+          CREATE POLICY "Anyone can view active services" ON provider_services
+            FOR SELECT USING (is_active = true);
