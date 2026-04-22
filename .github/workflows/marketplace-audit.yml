@@ -532,4 +532,4 @@ jobs:
             FOR ALL USING (auth.uid() = provider_id);
           
           CREATE POLICY "Anyone can view active services" ON provider_services
-            FOR SELECT USING (is_active = true);
+            FOR SELECT USING (is_active = true);v
