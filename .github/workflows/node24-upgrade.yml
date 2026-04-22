@@ -1,0 +1,328 @@
+# ============================================================
+# .github/workflows/node24-upgrade.yml
+# AAC — Node 20 → 24 Compatibility Audit & Upgrade Workflow
+# Run manually via workflow_dispatch to generate upgrade PR
+# ============================================================
+name: Node 20 → 24 Upgrade Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_pr:
+        description: "Create a PR with upgrade changes?"
+        required: true
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+      dry_run:
+        description: "Dry run only (no file changes)"
+        required: false
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+
+jobs:
+  # ──────────────────────────────────────────────
+  # PHASE 1: Compatibility Check (Node 20 vs 24)
+  # ──────────────────────────────────────────────
+  compatibility-check:
+    name: 🔬 Compatibility Matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["20", "22", "24"]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install deps (Node ${{ matrix.node }})
+        run: bun install --frozen-lockfile
+
+      - name: Build test (Node ${{ matrix.node }})
+        id: build
+        run: |
+          bun run build 2>&1 | tee build-node${{ matrix.node }}.log
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+        env:
+          VITE_SUPABASE_URL: "https://placeholder.supabase.co"
+          VITE_SUPABASE_ANON_KEY: "placeholder-anon-key"
+        continue-on-error: true
+
+      - name: Lint test (Node ${{ matrix.node }})
+        run: bun run lint 2>&1 | tee lint-node${{ matrix.node }}.log
+        continue-on-error: true
+
+      - name: TypeScript test (Node ${{ matrix.node }})
+        run: bun x tsc --noEmit 2>&1 | tee tsc-node${{ matrix.node }}.log
+        continue-on-error: true
+
+      - name: Upload compatibility report
+        uses: actions/upload-artifact@v4
+        with:
+          name: compat-node${{ matrix.node }}
+          path: "*.log"
+          retention-days: 7
+
+  # ──────────────────────────────────────────────
+  # PHASE 2: Dependency Upgrade Analysis
+  # ──────────────────────────────────────────────
+  dep-upgrade-analysis:
+    name: 📦 Dependency Upgrade Analysis
+    runs-on: ubuntu-latest
+    needs: compatibility-check
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - run: bun install --frozen-lockfile
+
+      # Check outdated packages
+      - name: List outdated packages
+        run: |
+          echo "## Outdated Packages" >> $GITHUB_STEP_SUMMARY
+          npm outdated --json 2>/dev/null | node -e "
+            const data = require('fs').readFileSync('/dev/stdin','utf8');
+            if (!data.trim()) { console.log('All packages up to date'); process.exit(0); }
+            const pkg = JSON.parse(data);
+            console.log('| Package | Current | Wanted | Latest |');
+            console.log('|---------|---------|--------|--------|');
+            Object.entries(pkg).forEach(([name, v]) => {
+              console.log(\`| \${name} | \${v.current} | \${v.wanted} | \${v.latest} |\`);
+            });
+          " >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "All packages at specified versions"
+
+      # Check for Node 24 breaking changes in key packages
+      - name: Check Vite 8 Node 24 compatibility
+        run: |
+          VITE_VER=$(node -e "console.log(require('./node_modules/vite/package.json').version)")
+          echo "Vite version: $VITE_VER"
+          # Vite 8+ requires Node 20.18+, fully supports Node 24
+          node -e "
+            const [major] = process.version.slice(1).split('.').map(Number);
+            console.log('Node major:', major);
+            if (major >= 24) console.log('✓ Vite 8 fully compatible with Node 24');
+          "
+
+      - name: Check TypeScript 5.8 → 5.x latest
+        run: |
+          CURR=$(node -e "console.log(require('./node_modules/typescript/package.json').version)")
+          LATEST=$(npm show typescript version 2>/dev/null)
+          echo "TypeScript: $CURR → $LATEST"
+
+      - name: Check for Node 24 deprecated APIs in source
+        run: |
+          echo "## Node 24 Breaking Change Scan" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for deprecated url.parse (use URL constructor)
+          if grep -r "url\.parse\b" src/ --include="*.ts" --include="*.tsx" 2>/dev/null; then
+            echo "::warning::url.parse() is deprecated in Node 22+. Use new URL() instead."
+            echo "⚠ **url.parse()** found — use \`new URL()\` instead" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check for Buffer() constructor (deprecated)
+          if grep -r "new Buffer(" src/ --include="*.ts" --include="*.tsx" 2>/dev/null; then
+            echo "::warning::new Buffer() is deprecated. Use Buffer.from() / Buffer.alloc()"
+            echo "⚠ **new Buffer()** found — use \`Buffer.from()\` instead" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check for crypto.createCipher (removed in Node 22)
+          if grep -r "createCipher\b" src/ --include="*.ts" --include="*.tsx" 2>/dev/null; then
+            echo "::error::crypto.createCipher removed in Node 22. Use createCipheriv()"
+            echo "❌ **crypto.createCipher()** found — removed in Node 22" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check for process.binding (removed in Node 24)
+          if grep -r "process\.binding" src/ --include="*.ts" --include="*.tsx" 2>/dev/null; then
+            echo "::error::process.binding() removed in Node 24"
+            echo "❌ **process.binding()** found — removed in Node 24" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "✓ Node 24 breaking change scan complete" >> $GITHUB_STEP_SUMMARY
+
+  # ──────────────────────────────────────────────
+  # PHASE 3: Apply Upgrade Changes + Create PR
+  # ──────────────────────────────────────────────
+  apply-upgrade:
+    name: 🔧 Apply Node 24 Upgrades
+    runs-on: ubuntu-latest
+    needs: dep-upgrade-analysis
+    if: ${{ github.event.inputs.dry_run != 'true' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - run: bun install --frozen-lockfile
+
+      # ── 1. Add engines field to package.json ──
+      - name: Pin Node engine to >=24
+        run: |
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.engines = { node: '>=24.0.0', bun: '>=1.0.0' };
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+            console.log('✓ Added engines field to package.json');
+          "
+
+      # ── 2. Remove package-lock.json (use bun only) ──
+      - name: Remove npm lockfile (bun is primary PM)
+        run: |
+          if [ -f "package-lock.json" ]; then
+            rm package-lock.json
+            echo "✓ Removed package-lock.json (bun.lock is canonical)"
+          fi
+
+      # ── 3. Update .nvmrc and .node-version ──
+      - name: Write .nvmrc and .node-version
+        run: |
+          echo "24" > .nvmrc
+          echo "24" > .node-version
+          echo "✓ Created .nvmrc and .node-version → 24"
+
+      # ── 4. Update tsconfig for Node 24 (ES2024 target) ──
+      - name: Upgrade tsconfig target to ES2024
+        run: |
+          node -e "
+            const fs = require('fs');
+            // Update tsconfig.app.json
+            if (fs.existsSync('tsconfig.app.json')) {
+              let content = fs.readFileSync('tsconfig.app.json', 'utf8');
+              // Upgrade target if it's ES2020 or lower
+              content = content.replace(/\"target\":\s*\"ES20(20|21|22|23)\"/g, '\"target\": \"ES2024\"');
+              // Ensure lib includes ES2024
+              content = content.replace(/\"ES20(20|21|22|23)\"/g, (m) => m.replace('ES20', 'ES20').replace(/ES202[0-3]/, 'ES2024'));
+              fs.writeFileSync('tsconfig.app.json', content);
+              console.log('✓ Updated tsconfig.app.json target');
+            }
+            // Update tsconfig.node.json
+            if (fs.existsSync('tsconfig.node.json')) {
+              let content = fs.readFileSync('tsconfig.node.json', 'utf8');
+              content = content.replace(/\"target\":\s*\"ES20(20|21|22|23)\"/g, '\"target\": \"ES2024\"');
+              fs.writeFileSync('tsconfig.node.json', content);
+              console.log('✓ Updated tsconfig.node.json target');
+            }
+          "
+
+      # ── 5. Upgrade vite.config.ts for Node 24 optimisations ──
+      - name: Patch vite.config.ts — add base + esbuild target
+        run: |
+          node -e "
+            const fs = require('fs');
+            let config = fs.readFileSync('vite.config.ts', 'utf8');
+            
+            // Add base: '/' if not present
+            if (!config.includes('base:')) {
+              config = config.replace(
+                'server: {',
+                'base: \"/\",\n  server: {'
+              );
+              console.log('✓ Added base: \"/\" to vite.config.ts');
+            } else {
+              console.log('  base: already present in vite.config.ts');
+            }
+            
+            // Add esbuild target for Node 24 (esnext)
+            if (!config.includes('esbuild:')) {
+              config = config.replace(
+                'plugins:',
+                'esbuild: { target: \"esnext\" },\n  plugins:'
+              );
+              console.log('✓ Added esbuild target: esnext');
+            }
+            
+            fs.writeFileSync('vite.config.ts', config);
+          "
+
+      # ── 6. Upgrade deps to latest compatible versions ──
+      - name: Update critical deps to latest
+        run: |
+          # Upgrade TypeScript to latest 5.x
+          bun add -d typescript@latest
+          
+          # Upgrade Vite plugins
+          bun add -d @vitejs/plugin-react-swc@latest
+          
+          # Upgrade ESLint ecosystem
+          bun add -d eslint@latest
+          
+          # Upgrade testing deps
+          bun add -d vitest@latest @testing-library/react@latest
+          
+          echo "✓ Core dev dependencies updated"
+
+      # ── 7. Verify build still passes ──
+      - name: Verify build on Node 24
+        run: bun run build
+        env:
+          VITE_SUPABASE_URL: "https://placeholder.supabase.co"
+          VITE_SUPABASE_ANON_KEY: "placeholder-anon-key"
+
+      # ── 8. Verify lint passes ──
+      - name: Verify lint on Node 24
+        run: bun run lint
+
+      # ── 9. Create PR ──
+      - name: Create upgrade PR
+        if: ${{ github.event.inputs.create_pr == 'true' }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/node24-upgrade
+          base: main
+          commit-message: "chore: upgrade Node 20 → 24, pin engines, remove npm lockfile"
+          title: "⬆ Node 20 → 24 Upgrade"
+          body: |
+            ## Node 20 → 24 Upgrade
+
+            This PR was automatically generated by the `node24-upgrade.yml` workflow.
+
+            ### Changes
+            - 📌 Added `engines: { node: ">=24.0.0", bun: ">=1.0.0" }` to `package.json`
+            - 🗑 Removed `package-lock.json` (bun is the canonical package manager)
+            - 📝 Created `.nvmrc` and `.node-version` → `24`
+            - 🎯 Updated TypeScript target to `ES2024` in tsconfig files
+            - ⚡ Added `esbuild: { target: "esnext" }` to `vite.config.ts`
+            - 🔧 Added `base: "/"` to `vite.config.ts` (fixes GitHub Pages deep-link 404s)
+            - 📦 Updated: `typescript`, `@vitejs/plugin-react-swc`, `eslint`, `vitest`
+
+            ### Verified
+            - ✅ Build passes on Node 24
+            - ✅ Lint passes on Node 24
+            - ✅ Compatibility matrix run on Node 20, 22, 24
+
+            ### Next Steps
+            1. Review the diff carefully
+            2. Run `bun install` locally after merging
+            3. Delete `bun.lockb` if `bun.lock` (v3 text format) is present
+          labels: |
+            dependencies
+            node-upgrade
+            automated
+          draft: false

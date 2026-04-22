@@ -1,0 +1,184 @@
+# ============================================================
+# .github/workflows/ci-deploy.yml
+# AAC — CI Pipeline + GitHub Pages Deploy
+# Node 20 → 24 upgrade  |  Bun 1.x  |  Vite 8
+# ============================================================
+name: CI · Audit · Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "24"
+  BUN_VERSION: "latest"
+
+jobs:
+  # ──────────────────────────────────────────────
+  # JOB 1 · Audit (runs on every PR + push)
+  # ──────────────────────────────────────────────
+  audit:
+    name: 🔍 Audit (Node ${{ env.NODE_VERSION }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # ── Lint ──
+      - name: ESLint
+        run: bun run lint
+
+      # ── TypeScript strict check ──
+      - name: TypeScript (strict)
+        run: bun x tsc --noEmit --strict
+
+      # ── Dependency audit (npm audit uses Node resolver) ──
+      - name: Security audit
+        run: npm audit --audit-level=high --omit=dev
+        continue-on-error: false
+
+      # ── Check for duplicate lockfiles ──
+      - name: Lockfile hygiene check
+        run: |
+          if [ -f "package-lock.json" ] && [ -f "bun.lock" ]; then
+            echo "::warning::Both package-lock.json and bun.lock exist. Remove package-lock.json."
+          fi
+          if [ -f "package-lock.json" ] && [ -f "bun.lockb" ]; then
+            echo "::warning::Both package-lock.json and bun.lockb exist. Remove package-lock.json."
+          fi
+
+      # ── Check for secrets accidentally committed ──
+      - name: Detect secrets in source
+        run: |
+          if grep -rE "(PAYFAST_MERCHANT_KEY|SUPABASE_SERVICE_ROLE|sb-[a-z0-9]+-anon-key)" src/ --include="*.ts" --include="*.tsx" --include="*.js"; then
+            echo "::error::Sensitive keys detected in source files! Move to environment variables."
+            exit 1
+          fi
+          echo "✓ No secrets detected in source"
+
+  # ──────────────────────────────────────────────
+  # JOB 2 · Unit Tests
+  # ──────────────────────────────────────────────
+  test:
+    name: 🧪 Vitest Unit Tests
+    runs-on: ubuntu-latest
+    needs: audit
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: bun install --frozen-lockfile
+
+      - name: Run unit tests
+        run: bun run test
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-results
+          path: coverage/
+          retention-days: 14
+
+  # ──────────────────────────────────────────────
+  # JOB 3 · Build
+  # ──────────────────────────────────────────────
+  build:
+    name: 🏗 Build (Vite + Node ${{ env.NODE_VERSION }})
+    runs-on: ubuntu-latest
+    needs: [audit, test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: bun install --frozen-lockfile
+
+      - name: Build production bundle
+        run: bun run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          NODE_ENV: production
+
+      # GitHub Pages SPA routing — ensure 404.html exists in dist
+      - name: Verify SPA 404.html
+        run: |
+          if [ ! -f "dist/404.html" ]; then
+            cp public/404.html dist/404.html 2>/dev/null || cp dist/index.html dist/404.html
+            echo "✓ 404.html copied to dist/"
+          else
+            echo "✓ 404.html already present in dist/"
+          fi
+
+      - name: Bundle size report
+        run: |
+          echo "## Bundle Size Report" >> $GITHUB_STEP_SUMMARY
+          du -sh dist/ >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          find dist/assets -name "*.js" -exec du -sh {} \; | sort -h >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+  # ──────────────────────────────────────────────
+  # JOB 4 · Deploy (main branch only)
+  # ──────────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy → GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Deployment summary
+        run: |
+          echo "✅ Deployed to: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "🌐 Live at: https://asanteandi.co.za" >> $GITHUB_STEP_SUMMARY

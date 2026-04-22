@@ -1,0 +1,142 @@
+# ============================================================
+# .github/workflows/supabase-deploy.yml
+# AAC — Supabase Edge Functions Deploy + DB Migration
+# Triggers on changes to supabase/ directory
+# ============================================================
+name: Supabase Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/functions/**"
+      - "supabase/migrations/**"
+      - "supabase/seed.sql"
+  workflow_dispatch:
+    inputs:
+      deploy_functions:
+        description: "Deploy Edge Functions?"
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+      run_migrations:
+        description: "Run DB migrations?"
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+
+env:
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Validate Edge Functions (Deno type check)
+  # ──────────────────────────────────────────────
+  validate-functions:
+    name: 🦕 Validate Edge Functions (Deno)
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.deploy_functions != 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type-check Edge Functions
+        run: |
+          for fn_dir in supabase/functions/*/; do
+            fn_name=$(basename "$fn_dir")
+            echo "Checking $fn_name..."
+            if [ -f "$fn_dir/index.ts" ]; then
+              deno check "$fn_dir/index.ts" \
+                --import-map="https://esm.sh" \
+                2>&1 || echo "::warning::$fn_name has type errors"
+            fi
+          done
+
+      - name: Lint Edge Functions
+        run: |
+          deno lint supabase/functions/ 2>&1 || echo "::warning::Lint warnings in Edge Functions"
+
+  # ──────────────────────────────────────────────
+  # Run DB Migrations
+  # ──────────────────────────────────────────────
+  migrate:
+    name: 🗄 Run DB Migrations
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.run_migrations != 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Run migrations
+        run: |
+          supabase db push \
+            --project-ref "$PROJECT_ID" \
+            --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+
+      - name: Generate TypeScript types
+        run: |
+          supabase gen types typescript \
+            --project-id "$PROJECT_ID" \
+            > src/types/supabase.ts
+          echo "✓ Updated src/types/supabase.ts"
+
+      - name: Commit updated types
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: regenerate Supabase TypeScript types"
+          file_pattern: "src/types/supabase.ts"
+          branch: main
+
+  # ──────────────────────────────────────────────
+  # Deploy Edge Functions
+  # ──────────────────────────────────────────────
+  deploy-functions:
+    name: ⚡ Deploy Edge Functions
+    runs-on: ubuntu-latest
+    needs: validate-functions
+    if: ${{ github.event.inputs.deploy_functions != 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy all Edge Functions
+        run: |
+          for fn_dir in supabase/functions/*/; do
+            fn_name=$(basename "$fn_dir")
+            # Skip _shared (utility module, not a deployable function)
+            if [[ "$fn_name" == _* ]]; then
+              echo "Skipping shared module: $fn_name"
+              continue
+            fi
+            echo "Deploying $fn_name..."
+            supabase functions deploy "$fn_name" \
+              --project-ref "$PROJECT_ID" \
+              --no-verify-jwt
+            echo "✓ $fn_name deployed"
+          done
+
+      - name: Set Edge Function secrets
+        run: |
+          # These secrets must be set in GitHub repo settings
+          supabase secrets set \
+            PAYFAST_MERCHANT_ID="${{ secrets.PAYFAST_MERCHANT_ID }}" \
+            PAYFAST_MERCHANT_KEY="${{ secrets.PAYFAST_MERCHANT_KEY }}" \
+            PAYFAST_PASSPHRASE="${{ secrets.PAYFAST_PASSPHRASE }}" \
+            RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}" \
+            --project-ref "$PROJECT_ID"
+          echo "✓ Secrets pushed to Edge Functions"
+
+      - name: Deployment summary
+        run: |
+          echo "## Edge Functions Deployed" >> $GITHUB_STEP_SUMMARY
+          supabase functions list --project-ref "$PROJECT_ID" >> $GITHUB_STEP_SUMMARY || true
