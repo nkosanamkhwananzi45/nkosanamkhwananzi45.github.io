@@ -25,7 +25,7 @@ jobs:
   marketplace-audit:
     runs-on: ubuntu-latest
     
-    # Fix Node.js 20 deprecation: force actions to use Node.js 24
+    # Force Node.js 24 for all JavaScript actions (fixes deprecation warning)
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     
@@ -45,14 +45,14 @@ jobs:
         with:
           node-version: '20'
       
-      - name: Setup Supabase CLI (latest stable)
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+      
+      - name: Setup Supabase CLI (official install script)
         run: |
-          # Fetch latest version from GitHub API
-          LATEST_VERSION=$(curl -s https://api.github.com/repos/supabase/cli/releases/latest | jq -r .tag_name | sed 's/^v//')
-          echo "Latest Supabase CLI version: $LATEST_VERSION"
-          
-          # Download and extract
-          curl -fsSL "https://github.com/supabase/cli/releases/download/v${LATEST_VERSION}/supabase_${LATEST_VERSION}_linux_amd64.tar.gz" | tar -xz
+          # Use the official install script which always fetches the latest version correctly
+          curl -fsSL https://raw.githubusercontent.com/supabase/cli/main/install.sh | bash
+          # Move to PATH
           sudo mv supabase /usr/local/bin/
           supabase --version
       
