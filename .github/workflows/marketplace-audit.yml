@@ -45,10 +45,16 @@ jobs:
         with:
           node-version: '20'
       
-      - name: Setup Supabase CLI
+      - name: Setup Supabase CLI (latest stable)
         run: |
-          curl -fsSL https://github.com/supabase/cli/releases/download/v1.125.2/supabase_1.125.2_linux_amd64.tar.gz | tar -xz
+          # Fetch latest version from GitHub API
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/supabase/cli/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "Latest Supabase CLI version: $LATEST_VERSION"
+          
+          # Download and extract
+          curl -fsSL "https://github.com/supabase/cli/releases/download/v${LATEST_VERSION}/supabase_${LATEST_VERSION}_linux_amd64.tar.gz" | tar -xz
           sudo mv supabase /usr/local/bin/
+          supabase --version
       
       - name: Create audit directory
         run: mkdir -p .audit-results
