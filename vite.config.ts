@@ -3,7 +3,35 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
+// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // CRITICAL: Must be "/" for GitHub Pages + CNAME (asanteandi.co.za)
+  base: "/",
+
+  // Node 24 / ESNext build target
+  esbuild: {
+    target: "esnext",
+  },
+
+  build: {
+    target: "esnext",
+    // Warn when chunks exceed 600KB (Node 24 supports native ESM chunking well)
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        // Manual chunks to keep PayFast + Supabase out of the main bundle
+        manualChunks: {
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "ui-vendor": ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-select"],
+          "query-vendor": ["@tanstack/react-query"],
+          "supabase-vendor": ["@supabase/supabase-js"],
+          "chart-vendor": ["recharts"],
+          "motion-vendor": ["framer-motion"],
+        },
+      },
+    },
+  },
+
   server: {
     host: "::",
     port: 8080,
@@ -11,10 +39,12 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
+
   plugins: [
     react(),
     mode === "development" && componentTagger(),
   ].filter(Boolean),
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -28,29 +58,15 @@ export default defineConfig(({ mode }) => ({
       "@tanstack/query-core",
     ],
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('react-router-dom') || id.includes('react-dom') || (id.includes('/react/') && !id.includes('react-query'))) return 'vendor-react';
-          if (id.includes('@radix-ui')) return 'vendor-ui';
-          if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) return 'vendor-utils';
-          if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-core')) return 'vendor-query';
-          if (id.includes('@supabase')) return 'vendor-supabase';
-          if (id.includes('framer-motion')) return 'vendor-motion';
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1000,
-    sourcemap: mode === 'development',
-    target: 'es2015',
-  },
+
+  // Optimise deps for Node 24 native ESM
   optimizeDeps: {
     include: [
-      'react',
-      'react-dom',
-      '@supabase/supabase-js',
-      '@tanstack/react-query',
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "@supabase/supabase-js",
+      "@tanstack/react-query",
     ],
   },
 }));
