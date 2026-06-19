@@ -5,6 +5,9 @@
 # ============================================================
 name: Supabase Deploy
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
@@ -66,6 +69,8 @@ jobs:
   migrate:
     name: 🗄 Run DB Migrations
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     if: ${{ github.event.inputs.run_migrations != 'false' }}
     steps:
       - uses: actions/checkout@v4
